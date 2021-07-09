@@ -40,7 +40,7 @@ Example: a reusable button, a textarea
 Utilities used in the application.
 Example: Firebase calls library, helpers, services
 
-### lib/components
+### lib/pages
 
 This folder is used to add all features/components of the application.
 Example: login.dart, events_list.dart

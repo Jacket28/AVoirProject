@@ -1,34 +1,37 @@
-// Copyright 2018 The Flutter team. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
+import 'package:a_voir_app/allEventPage.dart';
 import 'package:flutter/material.dart';
 
-void main() => runApp(MyApp());
-
-const primaryColor = const Color(0xA456A7);
+void main() {
+  runApp(MyApp());
+}
 
 class MyApp extends StatelessWidget {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Welcome to Flutter',
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
-        backgroundColor: Color(0xffa456a7),
-        appBar: AppBar(
-          title: const Text('Welcome to Flutter'),
-          backgroundColor: Color(0xffa456a7),
-        ),
-        body: const Center(
-          child: Text(
-            'Hello World',
-            style: TextStyle(
-              color: Color(0xFFFFFFFF),
-              fontSize: 50,
+          key: _scaffoldKey,
+          resizeToAvoidBottomInset: false,
+          appBar: AppBar(
+            backgroundColor: Color(0xffa456a7),
+            toolbarHeight: 70,
+            title: Image.asset(
+              "assets/images/logoText.png",
+              height: 150,
+              width: 150,
             ),
+            leading: Image.asset("assets/images/logo.png"),
+            actions: [
+              IconButton(
+                  icon: Icon(Icons.menu),
+                  iconSize: 40,
+                  onPressed: () => _scaffoldKey.currentState?.openEndDrawer()),
+            ],
           ),
-        ),
-      ),
+          body: AllEventPage()),
     );
   }
 }

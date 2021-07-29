@@ -1,4 +1,5 @@
-import 'package:a_voir_app/EventPage.dart';
+import 'package:a_voir_app/AddEventPage.dart';
+import 'package:a_voir_app/eventPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -85,7 +86,12 @@ class AllEventState extends State<AllEventPage> {
                   ),
                 ),
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AddEventPage()),
+                );
+              },
             ),
           ],
         ),

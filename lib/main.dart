@@ -39,28 +39,5 @@ class MyApp extends StatelessWidget {
             body: AllEventPage()),
       );
     });
-    /*return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-          key: _scaffoldKey,
-          resizeToAvoidBottomInset: false,
-          appBar: AppBar(
-            backgroundColor: Color(0xffa456a7),
-            toolbarHeight: 70,
-            title: Image.asset(
-              "assets/images/logoText.png",
-              height: 150,
-              width: 150,
-            ),
-            leading: Image.asset("assets/images/logo.png"),
-            actions: [
-              IconButton(
-                  icon: Icon(Icons.menu),
-                  iconSize: 40,
-                  onPressed: () => _scaffoldKey.currentState?.openEndDrawer()),
-            ],
-          ),
-          body: AllEventPage()),
-    );*/
   }
 }

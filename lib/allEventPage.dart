@@ -1,5 +1,5 @@
 import 'package:a_voir_app/AddEventPage.dart';
-import 'package:a_voir_app/eventPage.dart';
+import 'package:a_voir_app/EventPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -126,7 +126,6 @@ Future<List<Widget>> _getEvent(BuildContext context) async {
 
   events.get().then((querySnapshot) {
     querySnapshot.docs.forEach((result) {
-      print(result.get("title"));
       listofEvents.add(new Column(children: <Widget>[
         new Padding(
           padding: EdgeInsets.only(top: 30),
@@ -140,9 +139,11 @@ Future<List<Widget>> _getEvent(BuildContext context) async {
           child: TextButton(
               //ACTION OF THE FIRST EVENT !
               onPressed: () {
+                print(result.id);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => EventPage()),
+                  MaterialPageRoute(
+                      builder: (context) => EventPage(eventId: result.id)),
                 );
               },
               child: Center(
@@ -167,46 +168,4 @@ Future<List<Widget>> _getEvent(BuildContext context) async {
   print(listofEvents);
   await Future.delayed(Duration(seconds: 1));
   return listofEvents;
-}
-
-void getData() {
-  print("ENTER THE FUNCTION");
-  final String documentId = "Eb08Sn3STkO1eb9EzMs6";
-
-  CollectionReference events = FirebaseFirestore.instance.collection("events");
-
-  /*print("PRINTER : ");
-  print(events.doc("Eb08Sn3STkO1eb9EzMs6").get());
-  print("PRINTER");*/
-
-  events.get().then((querySnapshot) {
-    querySnapshot.docs.forEach((result) {
-      print(result.get("title"));
-    });
-  });
-
-  /*return FutureBuilder<DocumentSnapshot>(
-    future: _mydoc,
-    builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-      if (snapshot.hasError) {
-        print("SOMETHING WENT WRONG");
-        return Text("Something went wrong");
-      }
-
-      if (snapshot.hasData && !snapshot.data!.exists) {
-        print("DOCUMENT DOES NOT EXIST");
-        return Text("Document does not exist");
-      }
-
-      if (snapshot.connectionState == ConnectionState.done) {
-        Map<String, dynamic> data =
-            snapshot.data!.data() as Map<String, dynamic>;
-        print("DESCRIPTION: ${data['description']}");
-        return Text("Description: ${data['description']}");
-      }
-
-      print("LOADING");
-      return Text("loading");
-    },
-  );*/
 }

@@ -1,16 +1,17 @@
-import 'package:a_voir_app/AddEventPage.dart';
-import 'package:a_voir_app/eventPage.dart';
+import 'package:a_voir_app/addEventPage.dart';
+import 'package:a_voir_app/EventPage.dart';
+import 'package:a_voir_app/MyEvent.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class AllEventPage extends StatefulWidget {
   @override
-  AllEventState createState() => AllEventState();
+  _AllEventState createState() => _AllEventState();
 }
 
-class AllEventState extends State<AllEventPage> {
-  final listOfEvents = <Widget>[];
-
+class _AllEventState extends State<AllEventPage> {
   @override
   Widget build(BuildContext context) {
     return
@@ -50,7 +51,7 @@ class AllEventState extends State<AllEventPage> {
                               style:
                                   TextStyle(color: Colors.white, fontSize: 20),
                             ),
-                            getEvents(context)
+                            _getEvents(context),
                           ],
                         ),
                       ),
@@ -89,7 +90,15 @@ class AllEventState extends State<AllEventPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AddEventPage()),
+                  MaterialPageRoute(
+                      builder: (context) => AddEventPage(new MyEvent(
+                          title: "",
+                          description: "",
+                          address: "",
+                          npa: "",
+                          city: "",
+                          date: "",
+                          time: ""))),
                 );
               },
             ),
@@ -101,41 +110,70 @@ class AllEventState extends State<AllEventPage> {
   }
 }
 
-Widget getEvents(BuildContext context) {
+Widget _getEvents(BuildContext context) {
   List<Widget> listofEvents = [];
-  for (var i = 0; i < 10; i++) {
-    listofEvents.add(
-      new Padding(
-        padding: EdgeInsets.only(top: 30),
-      ),
-    );
-    listofEvents.add(
-      new Container(
-        height: 70,
-        width: 200,
-        child: TextButton(
-          //ACTION OF THE FIRST EVENT !
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => EventPage()),
-            );
-          },
-          child: Text(
-            'Event X',
-            style: TextStyle(fontSize: 20.0, color: Colors.white),
+  return Center(
+      child: FutureBuilder(
+    future: _getEvent(context),
+    builder: (BuildContext context, AsyncSnapshot<List<Widget>> snapshot) {
+      if (snapshot.connectionState == ConnectionState.done) {
+        if (snapshot.hasData) {
+          return new Column(children: snapshot.data!);
+        }
+      }
+      return CircularProgressIndicator();
+    },
+  ));
+}
+
+Future<List<Widget>> _getEvent(BuildContext context) async {
+  final CollectionReference events =
+      FirebaseFirestore.instance.collection("events");
+
+  List<Widget> listofEvents = [];
+
+  events.get().then((querySnapshot) {
+    querySnapshot.docs.forEach((result) {
+      listofEvents.add(new Column(children: <Widget>[
+        new Padding(
+          padding: EdgeInsets.only(top: 30),
+        ),
+      ]));
+
+      listofEvents.add(
+        new Container(
+          height: 70,
+          width: 200,
+          child: TextButton(
+              //ACTION OF THE FIRST EVENT !
+              onPressed: () {
+                print(result.id);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => EventPage(eventId: result.id)),
+                );
+              },
+              child: Center(
+                child: Text(
+                  result.get("title"),
+                  style: TextStyle(fontSize: 20.0, color: Colors.white),
+                  textAlign: TextAlign.center,
+                ),
+              )),
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.white,
+              width: 2,
+            ),
+            shape: BoxShape.rectangle,
+            borderRadius: new BorderRadius.circular(25.0),
           ),
         ),
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.white,
-            width: 2,
-          ),
-          shape: BoxShape.rectangle,
-          borderRadius: new BorderRadius.circular(25.0),
-        ),
-      ),
-    );
-  }
-  return new Column(children: listofEvents);
+      );
+    });
+  });
+  print(listofEvents);
+  await Future.delayed(Duration(seconds: 1));
+  return listofEvents;
 }

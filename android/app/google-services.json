@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "792756504044",
+    "project_id": "avoirproject-9a902",
+    "storage_bucket": "avoirproject-9a902.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:792756504044:android:1bea2e48aaeb73dabfacc9",
+        "android_client_info": {
+          "package_name": "hevs.a_voir.a_voir_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "792756504044-o5go8nulhd4onoqib5n9romc9ha9f0bl.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCjt4tqoEyzRPAkon3s8BpxGjUbNtWS_AI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "792756504044-o5go8nulhd4onoqib5n9romc9ha9f0bl.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

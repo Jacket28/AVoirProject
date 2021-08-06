@@ -1,9 +1,9 @@
-import 'package:a_voir_app/AddEventPage.dart';
+import 'package:a_voir_app/addEventPage.dart';
 import 'package:a_voir_app/EventPage.dart';
+import 'package:a_voir_app/MyEvent.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AllEventPage extends StatefulWidget {
@@ -90,7 +90,15 @@ class _AllEventState extends State<AllEventPage> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AddEventPage()),
+                  MaterialPageRoute(
+                      builder: (context) => AddEventPage(new MyEvent(
+                          title: "",
+                          description: "",
+                          address: "",
+                          npa: "",
+                          city: "",
+                          date: "",
+                          time: ""))),
                 );
               },
             ),

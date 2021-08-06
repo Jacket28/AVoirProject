@@ -1,6 +1,8 @@
 import 'dart:core';
 
 class MyEvent {
+  String id = "";
+
   String title = "";
   String description = "";
   String address = "";
@@ -45,6 +47,21 @@ class MyEvent {
           date: json['date']! as String,
           time: json['time']! as String,
         );
+
+  String get event_id {
+    return id;
+  }
+
+  set event_id(String id) {
+    this.id = id;
+  }
+
+  bool hasId() {
+    if (this.id != "") {
+      return true;
+    }
+    return false;
+  }
 
   String get event_title {
     return title;

@@ -7,11 +7,30 @@ import 'package:intl/intl.dart';
 import 'package:date_format/date_format.dart';
 
 class AddEventPage extends StatefulWidget {
+  AddEventPage(this._myEvent);
+
+  MyEvent _myEvent;
+
   @override
-  AddEventState createState() => AddEventState();
+  AddEventState createState() => AddEventState(_myEvent);
 }
 
 class AddEventState extends State<AddEventPage> {
+  AddEventState(MyEvent myEvent) {
+    _myEvent = myEvent;
+  }
+
+  MyEvent _myEvent = new MyEvent(
+      title: "",
+      description: "",
+      address: "",
+      npa: "",
+      city: "",
+      date: "",
+      time: "");
+
+  bool isEditing = false;
+
   double _height = 0;
   double _width = 0;
 
@@ -23,15 +42,6 @@ class AddEventState extends State<AddEventPage> {
 
   String dateTime = "";
 
-  MyEvent event = new MyEvent(
-      title: "",
-      description: "",
-      address: "",
-      npa: "",
-      city: "",
-      date: "",
-      time: "");
-
   DateTime selectedDate = DateTime.now();
 
   TimeOfDay selectedTime = TimeOfDay(hour: 00, minute: 00);
@@ -39,12 +49,21 @@ class AddEventState extends State<AddEventPage> {
   TextEditingController _dateController = TextEditingController();
   TextEditingController _timeController = TextEditingController();
 
-  final _bodyController = TextEditingController(
-    text: '',
-  );
+  final _titleController = TextEditingController();
+  final _locationController = TextEditingController();
+  final _descriptionController = TextEditingController();
 
   @override
   void initState() {
+    if (_myEvent.hasId()) {
+      isEditing = true;
+      _titleController.text = _myEvent.title;
+      _locationController.text =
+          _myEvent.address + ", " + _myEvent.npa + ", " + _myEvent.city;
+      _descriptionController.text = _myEvent.description;
+      _dateController.text = _myEvent.date;
+      _timeController.text = _myEvent.time;
+    }
     super.initState();
   }
 
@@ -87,31 +106,32 @@ class AddEventState extends State<AddEventPage> {
                                   TextStyle(color: Colors.white, fontSize: 20),
                             ),
                             Container(
-                              padding: EdgeInsets.only(
-                                  top: 20, left: 100, right: 100),
-                              child: TextField(
-                                  style: TextStyle(color: Colors.white),
-                                  decoration: InputDecoration(
-                                      hintStyle: TextStyle(color: Colors.grey),
-                                      enabledBorder: new OutlineInputBorder(
-                                        borderRadius:
-                                            new BorderRadius.circular(25.0),
-                                        borderSide:
-                                            BorderSide(color: Colors.white),
-                                      ),
-                                      focusedBorder: new OutlineInputBorder(
-                                        borderRadius:
-                                            new BorderRadius.circular(25.0),
-                                        borderSide:
-                                            BorderSide(color: Colors.white),
-                                      ),
-                                      labelStyle:
-                                          TextStyle(color: Colors.white),
-                                      hintText: 'Subject of Event.'),
-                                  onChanged: (text) {
-                                    event.title = text;
-                                  }),
-                            ),
+                                padding: EdgeInsets.only(
+                                    top: 20, left: 100, right: 100),
+                                child: TextField(
+                                    controller: _titleController,
+                                    style: TextStyle(color: Colors.white),
+                                    decoration: InputDecoration(
+                                        hintStyle:
+                                            TextStyle(color: Colors.grey),
+                                        enabledBorder: new OutlineInputBorder(
+                                          borderRadius:
+                                              new BorderRadius.circular(25.0),
+                                          borderSide:
+                                              BorderSide(color: Colors.white),
+                                        ),
+                                        focusedBorder: new OutlineInputBorder(
+                                          borderRadius:
+                                              new BorderRadius.circular(25.0),
+                                          borderSide:
+                                              BorderSide(color: Colors.white),
+                                        ),
+                                        labelStyle:
+                                            TextStyle(color: Colors.white),
+                                        hintText: 'Subject of Event.'),
+                                    onChanged: (text) {
+                                      _myEvent.title = text;
+                                    })),
                             Row(
                               children: <Widget>[
                                 Padding(
@@ -138,7 +158,7 @@ class AddEventState extends State<AddEventPage> {
                                 InkWell(
                                   onTap: () {
                                     _selectDate(context).then((value) {
-                                      event.date = value;
+                                      _myEvent.date = value;
                                     });
                                   },
                                   child: Container(
@@ -160,7 +180,7 @@ class AddEventState extends State<AddEventPage> {
                                           contentPadding:
                                               EdgeInsets.only(top: 0)),
                                       onChanged: (text) {
-                                        event.date = text;
+                                        _myEvent.date = text;
                                       },
                                     ),
                                   ),
@@ -169,7 +189,7 @@ class AddEventState extends State<AddEventPage> {
                                 InkWell(
                                   onTap: () {
                                     _selectTime(context).then((value) {
-                                      event.time = value;
+                                      _myEvent.time = value;
                                     });
                                   },
                                   child: Container(
@@ -190,7 +210,7 @@ class AddEventState extends State<AddEventPage> {
                                         // labelText: 'Time',
                                       ),
                                       onChanged: (text) {
-                                        event.time = text;
+                                        _myEvent.time = text;
                                       },
                                     ),
                                   ),
@@ -210,6 +230,7 @@ class AddEventState extends State<AddEventPage> {
                                 padding: EdgeInsets.only(
                                     top: 20, left: 100, right: 100),
                                 child: TextField(
+                                  controller: _locationController,
                                   style: TextStyle(color: Colors.white),
                                   decoration: InputDecoration(
                                       hintStyle: TextStyle(color: Colors.grey),
@@ -227,12 +248,12 @@ class AddEventState extends State<AddEventPage> {
                                       ),
                                       labelStyle:
                                           TextStyle(color: Colors.white),
-                                      hintText: 'Address, Npa, City'),
+                                      hintText: 'format : Address, Npa, City'),
                                   onChanged: (text) {
                                     List<String> temp = text.split(",");
-                                    event.address = temp.elementAt(0);
-                                    event.npa = temp.elementAt(1);
-                                    event.city = temp.elementAt(2);
+                                    _myEvent.address = temp.elementAt(0);
+                                    _myEvent.npa = temp.elementAt(1).trim();
+                                    _myEvent.city = temp.elementAt(2).trim();
                                   },
                                 ),
                               ),
@@ -251,13 +272,12 @@ class AddEventState extends State<AddEventPage> {
                                 padding: EdgeInsets.only(
                                     top: 1, left: 100, right: 100),
                                 child: TextField(
-                                  controller: _bodyController,
+                                  controller: _descriptionController,
                                   maxLines: null,
                                   maxLength: 300,
                                   style: TextStyle(color: Colors.white),
                                   decoration: InputDecoration(
-                                      hintStyle:
-                                          TextStyle(color: Color(0xff643165)),
+                                      hintStyle: TextStyle(color: Colors.grey),
                                       enabledBorder: new OutlineInputBorder(
                                         borderRadius:
                                             new BorderRadius.circular(25.0),
@@ -273,9 +293,9 @@ class AddEventState extends State<AddEventPage> {
                                       labelText: '',
                                       labelStyle:
                                           TextStyle(color: Colors.white),
-                                      hintText: ''),
+                                      hintText: 'Description of the event'),
                                   onChanged: (text) {
-                                    event.description = text;
+                                    _myEvent.description = text;
                                   },
                                 ),
                               ),
@@ -302,26 +322,21 @@ class AddEventState extends State<AddEventPage> {
                                             width: 25.0),
                                         Container(
                                             padding: EdgeInsets.only(left: 5),
-                                            child: new Text(
-                                              "Submit",
-                                              style: TextStyle(
-                                                  color: Color(0xffa456a7),
-                                                  fontSize: 20.0),
-                                            ))
+                                            child: _setButtonText(context))
                                       ],
                                     ),
                                   ),
                                 ),
                                 onPressed: () {
-                                  if (event.date == "" ||
-                                      event.time == "" ||
-                                      event.title == "" ||
-                                      event.address == "" ||
-                                      event.npa == "" ||
-                                      event.city == "") {
+                                  if (_myEvent.date == "" ||
+                                      _myEvent.time == "" ||
+                                      _myEvent.title == "" ||
+                                      _myEvent.address == "" ||
+                                      _myEvent.npa == "" ||
+                                      _myEvent.city == "") {
                                     //Error message to create
                                   } else {
-                                    _addEventToDatabase(context, event);
+                                    _editDatabase(context);
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
@@ -343,6 +358,17 @@ class AddEventState extends State<AddEventPage> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _setButtonText(BuildContext context) {
+    String text = "Submit";
+    if (isEditing) {
+      text = "Save";
+    }
+    return new Text(
+      text,
+      style: TextStyle(color: Color(0xffa456a7), fontSize: 20.0),
     );
   }
 
@@ -382,15 +408,27 @@ class AddEventState extends State<AddEventPage> {
     return _timeController.text;
   }
 
-  Future<Null> _addEventToDatabase(
-      BuildContext context, MyEvent newEvent) async {
-    final eventRefs = FirebaseFirestore.instance
+  _editDatabase(BuildContext context) {
+    CollectionReference eventRefs = FirebaseFirestore.instance
         .collection('events')
         .withConverter<MyEvent>(
           fromFirestore: (snapshot, _) => MyEvent.fromJson(snapshot.data()!),
           toFirestore: (event, _) => event.toJson(),
         );
+    if (isEditing) {
+      _updateEventInDatabase(context, eventRefs);
+    } else {
+      _addEventToDatabase(context, eventRefs);
+    }
+  }
 
-    await eventRefs.add(newEvent);
+  Future<Null> _updateEventInDatabase(
+      BuildContext context, CollectionReference eventRefs) async {
+    await eventRefs.doc(_myEvent.id).update(_myEvent.toJson());
+  }
+
+  Future<Null> _addEventToDatabase(
+      BuildContext context, CollectionReference eventRefs) async {
+    await eventRefs.add(_myEvent);
   }
 }

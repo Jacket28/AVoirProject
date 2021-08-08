@@ -56,10 +56,7 @@ class EventState extends State<EventPage> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(top: 20),
-            ),
-            Padding(padding: EdgeInsets.only(top: 50)),
+            Padding(padding: EdgeInsets.only(top: 10, bottom: 40)),
             Center(
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
@@ -68,7 +65,7 @@ class EventState extends State<EventPage> {
                     Column(children: <Widget>[
                       Container(
                         padding: EdgeInsets.only(bottom: 50),
-                        width: 300,
+                        width: 380,
                         decoration: BoxDecoration(
                           shape: BoxShape.rectangle,
                           color: Color(0xff643165),
@@ -97,7 +94,7 @@ class EventState extends State<EventPage> {
                                         Container(
                                             //padding: EdgeInsets.only(left: 4),
                                             child: new Text(
-                                          "Edit this event",
+                                          "Participate",
                                           style: TextStyle(
                                               color: Color(0xffa456a7),
                                               fontSize: 20.0),
@@ -106,14 +103,7 @@ class EventState extends State<EventPage> {
                                     ),
                                   ),
                                 ),
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            AddEventPage(myEvent)),
-                                  );
-                                }),
+                                onPressed: () {}),
                           ],
                         ),
                       ),
@@ -185,7 +175,7 @@ class EventState extends State<EventPage> {
               Row(
                 children: <Widget>[
                   IconButton(
-                    padding: EdgeInsets.only(left: 30, right: 80),
+                    padding: EdgeInsets.only(left: 30, right: 110),
                     onPressed: () {},
                     icon: Image.asset(
                       "assets/images/share.png",
@@ -198,8 +188,14 @@ class EventState extends State<EventPage> {
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   IconButton(
-                    padding: EdgeInsets.only(left: 70),
-                    onPressed: () {},
+                    padding: EdgeInsets.only(left: 120),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddEventPage(myEvent)),
+                      );
+                    },
                     icon: Image.asset(
                       "assets/images/pen.png",
                       height: 100,
@@ -223,9 +219,7 @@ class EventState extends State<EventPage> {
                   Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        onTap: () {
-                          print("salut");
-                        },
+                        onTap: () {},
                         child: Container(
                           child: Row(
                             children: <Widget>[
@@ -259,9 +253,11 @@ class EventState extends State<EventPage> {
                   Padding(
                     padding: EdgeInsets.only(left: 20),
                   ),
-                  Text(
-                    snapshot.data!.title,
-                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  Expanded(
+                    child: Text(
+                      snapshot.data!.title,
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
                   ),
                 ],
               ),
@@ -328,10 +324,10 @@ class EventState extends State<EventPage> {
               Row(
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.only(left: 20, top: 40),
+                    padding: EdgeInsets.only(left: 50, top: 40),
                   ),
                   Container(
-                    //padding: EdgeInsets.only(left: 10),
+                    padding: EdgeInsets.only(bottom: 20, top: 20, left: 80),
                     child: Text(
                       "Description : ",
                       style: TextStyle(color: Colors.white, fontSize: 20),
@@ -357,10 +353,10 @@ class EventState extends State<EventPage> {
               Row(
                 children: <Widget>[
                   Padding(
-                    padding: EdgeInsets.only(left: 20, top: 30),
+                    padding: EdgeInsets.only(left: 50, top: 30),
                   ),
                   Container(
-                    padding: EdgeInsets.only(left: 80),
+                    padding: EdgeInsets.only(top: 20, bottom: 20, left: 80),
                     child: Text(
                       "Attendants : ",
                       style: TextStyle(color: Colors.white, fontSize: 20),

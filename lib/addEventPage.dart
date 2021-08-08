@@ -20,6 +20,8 @@ class AddEventState extends State<AddEventPage> {
     _myEvent = myEvent;
   }
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   MyEvent _myEvent = new MyEvent(
       title: "",
       description: "",
@@ -73,14 +75,29 @@ class AddEventState extends State<AddEventPage> {
     _width = MediaQuery.of(context).size.width;
     dateTime = DateFormat.yMd().format(DateTime.now());
     return new Scaffold(
+      key: _scaffoldKey,
+      resizeToAvoidBottomInset: false,
+      appBar: AppBar(
+        backgroundColor: Color(0xffa456a7),
+        toolbarHeight: 70,
+        title: Image.asset(
+          "assets/images/logoText.png",
+          height: 150,
+          width: 150,
+        ),
+        leading: Image.asset("assets/images/logo.png"),
+        actions: [
+          IconButton(
+              icon: Icon(Icons.menu),
+              iconSize: 40,
+              onPressed: () => _scaffoldKey.currentState?.openEndDrawer()),
+        ],
+      ),
       backgroundColor: Color(0xffa456a7),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(top: 20),
-            ),
-            Padding(padding: EdgeInsets.only(top: 50)),
+            Padding(padding: EdgeInsets.only(top: 10)),
             Center(
               child: SingleChildScrollView(
                 scrollDirection: Axis.vertical,
@@ -89,7 +106,7 @@ class AddEventState extends State<AddEventPage> {
                     Column(children: <Widget>[
                       Container(
                         padding: EdgeInsets.only(bottom: 50),
-                        width: 400,
+                        width: 380,
                         decoration: BoxDecoration(
                           shape: BoxShape.rectangle,
                           color: Color(0xff643165),

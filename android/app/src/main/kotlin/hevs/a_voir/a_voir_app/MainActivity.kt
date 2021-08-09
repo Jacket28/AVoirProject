@@ -1,4 +1,4 @@
-package com.example.a_voir_app
+package hevs.a_voir.a_voir_app
 
 import io.flutter.embedding.android.FlutterActivity
 

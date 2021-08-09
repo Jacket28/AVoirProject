@@ -1,14 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.a_voir_app">
+    package="hevs.a_voir.a_voir_app">
     <uses-permission
-             android:name="android.permission.ACCESS_NETWORK_STATE" />
+             android:name="android.permission.ACCESS_NETWORK_STATE" />  
    <application
         android:label="a_voir_app"
         android:icon="@mipmap/ic_launcher"
         android:name="androidx.multidex.MultiDexApplication" >
          
         <activity
-            android:name=".MainActivity"
+            android:name="hevs.a_voir.a_voir_app.MainActivity"
             android:launchMode="singleTop"
             android:theme="@style/LaunchTheme"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"

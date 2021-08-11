@@ -1,5 +1,6 @@
 import 'dart:core';
 
+//This class is used to interact with the events objects in the firebase database
 class MyEvent {
   String id = "";
 
@@ -10,12 +11,8 @@ class MyEvent {
   String city = "";
   String date = "";
   String time = "";
-  //String creator
 
-  //DateTime endDate = DateTime.now();
-  //String image = "";
-  // ajouter les coordonnées
-
+  //Used to translate attributes to JSON for the DB.
   Map<String, Object?> toJson() {
     return {
       'title': title,
@@ -37,6 +34,7 @@ class MyEvent {
       required this.date,
       required this.time});
 
+  //Used to translate from DB.
   MyEvent.fromJson(Map<String, Object?> json)
       : this(
           title: json['title']! as String,
@@ -118,20 +116,4 @@ class MyEvent {
   set event_time(String time) {
     this.time = time;
   }
-
-  /* DateTime get event_endDate {
-    return endDate;
-  }
-
-  set event_endDate(DateTime date) {
-    this.endDate = date;
-  }*/
-
-  /*String get event_image {
-    return image;
-  }
-
-  set event_image(String image) {
-    this.image = image;
-  }*/
 }

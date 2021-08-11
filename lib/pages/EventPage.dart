@@ -1,10 +1,12 @@
-import 'package:a_voir_app/MyEvent.dart';
-import 'package:a_voir_app/addEventPage.dart';
+import 'package:a_voir_app/models/MyEvent.dart';
+import 'package:a_voir_app/pages/addEventPage.dart';
+import 'package:a_voir_app/ui/appBar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+//This page is used to display information about a specific event.
 class EventPage extends StatefulWidget {
   const EventPage({required this.eventId});
 
@@ -15,6 +17,7 @@ class EventPage extends StatefulWidget {
 }
 
 class EventState extends State<EventPage> {
+  //The scaffoldKey will be used later for the burger menu
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   String eventId = "";
@@ -36,21 +39,10 @@ class EventState extends State<EventPage> {
     return new Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        backgroundColor: Color(0xffa456a7),
-        toolbarHeight: 70,
-        title: Image.asset(
-          "assets/images/logoText.png",
-          height: 150,
-          width: 150,
-        ),
-        leading: Image.asset("assets/images/logo.png"),
-        actions: [
-          IconButton(
-              icon: Icon(Icons.menu),
-              iconSize: 40,
-              onPressed: () => _scaffoldKey.currentState?.openEndDrawer()),
-        ],
+      //the appBar is created upon reusable widget which is called appBar.dart.
+      appBar: BaseAppBar(
+        appBar: AppBar(),
+        scaffoldKey: _scaffoldKey,
       ),
       backgroundColor: Color(0xffa456a7),
       body: SingleChildScrollView(
@@ -91,8 +83,8 @@ class EventState extends State<EventPage> {
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: <Widget>[
+                                        //Will be used later to take part the event
                                         Container(
-                                            //padding: EdgeInsets.only(left: 4),
                                             child: new Text(
                                           "Participate",
                                           style: TextStyle(
@@ -117,9 +109,9 @@ class EventState extends State<EventPage> {
         ),
       ),
     );
-    //);
   }
 
+  //Method used to get all the attendants of an event (will be used later with the DB)
   Widget getAttendants() {
     List<Widget> listofAttendants = [];
 
@@ -131,9 +123,7 @@ class EventState extends State<EventPage> {
               child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () {
-                      print("salut");
-                    },
+                    onTap: () {},
                     child: Container(
                       child: Row(
                         children: <Widget>[
@@ -146,11 +136,6 @@ class EventState extends State<EventPage> {
                             ),
                             Padding(
                                 padding: EdgeInsets.only(left: 10, top: 50)),
-                            Text(
-                              "Robin Gallay",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 20),
-                            ),
                           ]),
                         ],
                       ),
@@ -162,11 +147,13 @@ class EventState extends State<EventPage> {
     return new Column(children: listofAttendants);
   }
 
+  //Method used to get an event from the DB.
   Widget _getEvent(BuildContext context) {
     return Center(
         child: FutureBuilder(
       future: _selectEvent(context, eventId),
       builder: (BuildContext context, AsyncSnapshot<MyEvent> snapshot) {
+        //this condition is used to handle errors
         if (snapshot.connectionState == ConnectionState.done) {
           print("Connection done");
           if (snapshot.hasData) {
@@ -210,6 +197,7 @@ class EventState extends State<EventPage> {
                     padding: EdgeInsets.only(left: 20, top: 40),
                   ),
                   Text(
+                    //Creator section
                     "Creator : ",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
@@ -247,6 +235,7 @@ class EventState extends State<EventPage> {
                     padding: EdgeInsets.only(left: 20, top: 40),
                   ),
                   Text(
+                    //Subject section
                     "Subject : ",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
@@ -267,6 +256,7 @@ class EventState extends State<EventPage> {
                     padding: EdgeInsets.only(left: 20, top: 40),
                   ),
                   Text(
+                    //Date section
                     "Date : ",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
@@ -285,6 +275,7 @@ class EventState extends State<EventPage> {
                     padding: EdgeInsets.only(left: 20, top: 40),
                   ),
                   Text(
+                    //Time section
                     "Time : ",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
@@ -303,6 +294,7 @@ class EventState extends State<EventPage> {
                     padding: EdgeInsets.only(left: 20, top: 50),
                   ),
                   Text(
+                    //Location section
                     "Location : ",
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
@@ -329,6 +321,7 @@ class EventState extends State<EventPage> {
                   Container(
                     padding: EdgeInsets.only(bottom: 20, top: 20, left: 80),
                     child: Text(
+                      //description section
                       "Description : ",
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
@@ -358,6 +351,7 @@ class EventState extends State<EventPage> {
                   Container(
                     padding: EdgeInsets.only(top: 20, bottom: 20, left: 80),
                     child: Text(
+                      //attendants section
                       "Attendants : ",
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
@@ -382,6 +376,7 @@ class EventState extends State<EventPage> {
     ));
   }
 
+  //Method used to display information about a specific event regarding the one clicked in the menu.
   Future<MyEvent> _selectEvent(BuildContext context, String eventId) async {
     final DocumentSnapshot<Map<String, Object?>> event = await FirebaseFirestore
         .instance

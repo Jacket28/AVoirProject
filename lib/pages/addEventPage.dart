@@ -1,11 +1,14 @@
-import 'package:a_voir_app/MyEvent.dart';
-import 'package:a_voir_app/allEventPage.dart';
+import 'package:a_voir_app/config/main.dart';
+import 'package:a_voir_app/models/MyEvent.dart';
+import 'package:a_voir_app/pages/allEventPage.dart';
+import 'package:a_voir_app/ui/appBar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:date_format/date_format.dart';
 
+// This page is used to add new events to the DB.
 class AddEventPage extends StatefulWidget {
   AddEventPage(this._myEvent);
 
@@ -20,6 +23,7 @@ class AddEventState extends State<AddEventPage> {
     _myEvent = myEvent;
   }
 
+  //The scaffoldKey will be used later for the burger menu
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   MyEvent _myEvent = new MyEvent(
@@ -31,6 +35,7 @@ class AddEventState extends State<AddEventPage> {
       date: "",
       time: "");
 
+  //Used to know if the textField can be edited or not.
   bool isEditing = false;
 
   double _height = 0;
@@ -48,6 +53,7 @@ class AddEventState extends State<AddEventPage> {
 
   TimeOfDay selectedTime = TimeOfDay(hour: 00, minute: 00);
 
+  //controllers are used to manage changes with the texfield.
   TextEditingController _dateController = TextEditingController();
   TextEditingController _timeController = TextEditingController();
 
@@ -55,6 +61,7 @@ class AddEventState extends State<AddEventPage> {
   final _locationController = TextEditingController();
   final _descriptionController = TextEditingController();
 
+  //InitSate is used to set the textFields to empty at the initialization of the page.
   @override
   void initState() {
     if (_myEvent.hasId()) {
@@ -77,21 +84,10 @@ class AddEventState extends State<AddEventPage> {
     return new Scaffold(
       key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        backgroundColor: Color(0xffa456a7),
-        toolbarHeight: 70,
-        title: Image.asset(
-          "assets/images/logoText.png",
-          height: 150,
-          width: 150,
-        ),
-        leading: Image.asset("assets/images/logo.png"),
-        actions: [
-          IconButton(
-              icon: Icon(Icons.menu),
-              iconSize: 40,
-              onPressed: () => _scaffoldKey.currentState?.openEndDrawer()),
-        ],
+      //the appBar is created upon reusable widget which is called appBar.dart.
+      appBar: BaseAppBar(
+        appBar: AppBar(),
+        scaffoldKey: _scaffoldKey,
       ),
       backgroundColor: Color(0xffa456a7),
       body: SingleChildScrollView(
@@ -118,6 +114,7 @@ class AddEventState extends State<AddEventPage> {
                               padding: EdgeInsets.only(top: 30),
                             ),
                             Text(
+                              //Title section
                               "* Title (3 words max.)",
                               style:
                                   TextStyle(color: Colors.white, fontSize: 20),
@@ -155,6 +152,7 @@ class AddEventState extends State<AddEventPage> {
                                     padding:
                                         EdgeInsets.only(top: 10, left: 65)),
                                 Text(
+                                  //Date section
                                   "* Date",
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 20),
@@ -163,6 +161,7 @@ class AddEventState extends State<AddEventPage> {
                                     padding:
                                         EdgeInsets.only(top: 100, left: 145)),
                                 Text(
+                                  //time section
                                   "* Time",
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 20),
@@ -224,7 +223,6 @@ class AddEventState extends State<AddEventPage> {
                                       decoration: InputDecoration(
                                         disabledBorder: UnderlineInputBorder(
                                             borderSide: BorderSide.none),
-                                        // labelText: 'Time',
                                       ),
                                       onChanged: (text) {
                                         _myEvent.time = text;
@@ -239,6 +237,7 @@ class AddEventState extends State<AddEventPage> {
                                 padding: EdgeInsets.only(top: 30),
                               ),
                               Text(
+                                //Location section
                                 "* Location",
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
@@ -278,6 +277,7 @@ class AddEventState extends State<AddEventPage> {
                                 padding: EdgeInsets.only(top: 30),
                               ),
                               Text(
+                                //Description of the events section
                                 "Description",
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
@@ -357,7 +357,7 @@ class AddEventState extends State<AddEventPage> {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                          builder: (context) => AllEventPage()),
+                                          builder: (context) => MyApp()),
                                     );
                                   }
                                 },
@@ -378,6 +378,7 @@ class AddEventState extends State<AddEventPage> {
     );
   }
 
+  //Submit button
   Widget _setButtonText(BuildContext context) {
     String text = "Submit";
     if (isEditing) {
@@ -389,6 +390,7 @@ class AddEventState extends State<AddEventPage> {
     );
   }
 
+  //Used to create the date picker
   Future<String> _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
         context: context,
@@ -405,6 +407,7 @@ class AddEventState extends State<AddEventPage> {
     return _dateController.text;
   }
 
+  //used to create the time picker
   Future<String> _selectTime(BuildContext context) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -425,6 +428,7 @@ class AddEventState extends State<AddEventPage> {
     return _timeController.text;
   }
 
+  //This method is used to update the databse. (determine if the page is in edit mode. If yes, we update the DB, if not we add in DB)
   _editDatabase(BuildContext context) {
     CollectionReference eventRefs = FirebaseFirestore.instance
         .collection('events')
@@ -439,11 +443,13 @@ class AddEventState extends State<AddEventPage> {
     }
   }
 
+  //This method is used to update the DB
   Future<Null> _updateEventInDatabase(
       BuildContext context, CollectionReference eventRefs) async {
     await eventRefs.doc(_myEvent.id).update(_myEvent.toJson());
   }
 
+  //This method is used to add an event to the DB
   Future<Null> _addEventToDatabase(
       BuildContext context, CollectionReference eventRefs) async {
     await eventRefs.add(_myEvent);

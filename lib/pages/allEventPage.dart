@@ -1,11 +1,12 @@
-import 'package:a_voir_app/addEventPage.dart';
-import 'package:a_voir_app/EventPage.dart';
-import 'package:a_voir_app/MyEvent.dart';
+import 'package:a_voir_app/pages/addEventPage.dart';
+import 'package:a_voir_app/pages/EventPage.dart';
+import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+//This class is used to display all the events that are in the DB.
 class AllEventPage extends StatefulWidget {
   @override
   _AllEventState createState() => _AllEventState();
@@ -14,11 +15,7 @@ class AllEventPage extends StatefulWidget {
 class _AllEventState extends State<AllEventPage> {
   @override
   Widget build(BuildContext context) {
-    return
-        //new WillPopScope(
-        //onWillPop: () async => false,
-        //child:
-        new Scaffold(
+    return new Scaffold(
       backgroundColor: Color(0xffa456a7),
       body: SingleChildScrollView(
         child: Column(
@@ -110,6 +107,7 @@ class _AllEventState extends State<AllEventPage> {
   }
 }
 
+//this method is used to get all the events from the DB.
 Widget _getEvents(BuildContext context) {
   List<Widget> listofEvents = [];
   return Center(
@@ -126,13 +124,16 @@ Widget _getEvents(BuildContext context) {
   ));
 }
 
+//This method is used to build the interface of the page based uppon the gotten events from the DB.
 Future<List<Widget>> _getEvent(BuildContext context) async {
   final CollectionReference events =
       FirebaseFirestore.instance.collection("events");
 
+  //we store all the events into this List.
   List<Widget> listofEvents = [];
 
-  events.get().then((querySnapshot) {
+  //await is necessary to wait for the asynchronous call.
+  await events.get().then((querySnapshot) {
     querySnapshot.docs.forEach((result) {
       listofEvents.add(new Column(children: <Widget>[
         new Padding(
@@ -145,7 +146,6 @@ Future<List<Widget>> _getEvent(BuildContext context) async {
           height: 70,
           width: 200,
           child: TextButton(
-              //ACTION OF THE FIRST EVENT !
               onPressed: () {
                 print(result.id);
                 Navigator.push(

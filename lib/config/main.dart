@@ -1,7 +1,9 @@
-import 'package:a_voir_app/allEventPage.dart';
+import 'package:a_voir_app/pages/allEventPage.dart';
+import 'package:a_voir_app/ui/appBar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+//This page is the initialization page which call the first page of the app (allEventPage).
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -9,32 +11,22 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+  //scaffoldKey will be used later for the burger menu
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   @override
   Widget build(BuildContext context) {
+    //FutureBuilder is created for using asynchronous calls since we have a fireBase databse.
     return FutureBuilder(builder: (context, snapshot) {
       return MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
             key: _scaffoldKey,
             resizeToAvoidBottomInset: false,
-            appBar: AppBar(
-              backgroundColor: Color(0xffa456a7),
-              toolbarHeight: 70,
-              title: Image.asset(
-                "assets/images/logoText.png",
-                height: 150,
-                width: 150,
-              ),
-              leading: Image.asset("assets/images/logo.png"),
-              actions: [
-                IconButton(
-                    icon: Icon(Icons.menu),
-                    iconSize: 40,
-                    onPressed: () =>
-                        _scaffoldKey.currentState?.openEndDrawer()),
-              ],
+            //the appBar is created upon reusable widget which is called appBar.dart.
+            appBar: BaseAppBar(
+              appBar: AppBar(),
+              scaffoldKey: _scaffoldKey,
             ),
             body: AllEventPage()),
       );

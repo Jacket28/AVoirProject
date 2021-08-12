@@ -1,6 +1,7 @@
 import 'package:a_voir_app/pages/addEventPage.dart';
 import 'package:a_voir_app/pages/EventPage.dart';
 import 'package:a_voir_app/models/MyEvent.dart';
+import 'package:a_voir_app/ui/appBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -13,96 +14,106 @@ class AllEventPage extends StatefulWidget {
 }
 
 class _AllEventState extends State<AllEventPage> {
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      backgroundColor: Color(0xffa456a7),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.only(top: 20),
-            ),
-            Padding(padding: EdgeInsets.only(top: 50)),
-            Center(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  children: <Widget>[
-                    Column(children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.only(bottom: 50),
-                        width: 300,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          color: Color(0xff643165),
-                          borderRadius: new BorderRadius.circular(25.0),
-                        ),
-                        child: Column(
-                          children: <Widget>[
-                            Padding(
-                              padding: EdgeInsets.only(top: 30),
-                            ),
-                            Text(
-                              "All events",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 20),
-                            ),
-                            _getEvents(context),
-                          ],
-                        ),
-                      ),
-                    ]),
-                  ],
+    return new WillPopScope(
+        onWillPop: () async => false,
+        child: Scaffold(
+          key: _scaffoldKey,
+          resizeToAvoidBottomInset: false,
+          appBar: BaseAppBar(
+            appBar: AppBar(),
+            scaffoldKey: _scaffoldKey,
+          ),
+          backgroundColor: Color(0xffa456a7),
+          body: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Padding(
+                  padding: EdgeInsets.only(top: 20),
                 ),
-              ),
-            ),
-            Padding(padding: EdgeInsets.only(top: 30)),
-            TextButton(
-              child: Container(
-                height: 50,
-                width: 130,
-                decoration: BoxDecoration(
-                  shape: BoxShape.rectangle,
-                  color: Colors.white,
-                  borderRadius: new BorderRadius.circular(25.0),
-                ),
-                child: Center(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
-                      new Image.asset('assets/images/addEvent.png',
-                          height: 25.0, width: 25.0),
-                      Container(
-                          padding: EdgeInsets.only(left: 5),
-                          child: new Text(
-                            "Add new ",
-                            style: TextStyle(
-                                color: Color(0xffa456a7), fontSize: 20.0),
-                          ))
-                    ],
+                Padding(padding: EdgeInsets.only(top: 50)),
+                Center(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      children: <Widget>[
+                        Column(children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.only(bottom: 50),
+                            width: 300,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              color: Color(0xff643165),
+                              borderRadius: new BorderRadius.circular(25.0),
+                            ),
+                            child: Column(
+                              children: <Widget>[
+                                Padding(
+                                  padding: EdgeInsets.only(top: 30),
+                                ),
+                                Text(
+                                  "All events",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                                _getEvents(context),
+                              ],
+                            ),
+                          ),
+                        ]),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => AddEventPage(new MyEvent(
-                          title: "",
-                          description: "",
-                          address: "",
-                          npa: "",
-                          city: "",
-                          date: "",
-                          time: ""))),
-                );
-              },
+                Padding(padding: EdgeInsets.only(top: 30)),
+                TextButton(
+                  child: Container(
+                    height: 50,
+                    width: 130,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                      color: Colors.white,
+                      borderRadius: new BorderRadius.circular(25.0),
+                    ),
+                    child: Center(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          new Image.asset('assets/images/addEvent.png',
+                              height: 25.0, width: 25.0),
+                          Container(
+                              padding: EdgeInsets.only(left: 5),
+                              child: new Text(
+                                "Add new ",
+                                style: TextStyle(
+                                    color: Color(0xffa456a7), fontSize: 20.0),
+                              ))
+                        ],
+                      ),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => AddEventPage(new MyEvent(
+                              title: "",
+                              description: "",
+                              address: "",
+                              npa: "",
+                              city: "",
+                              date: "",
+                              time: ""))),
+                    );
+                  },
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+        ));
     //);
   }
 }

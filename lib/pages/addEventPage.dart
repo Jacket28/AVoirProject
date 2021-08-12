@@ -1,4 +1,4 @@
-import 'package:a_voir_app/config/main.dart';
+import 'package:a_voir_app/main.dart';
 import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';

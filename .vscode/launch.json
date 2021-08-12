@@ -4,11 +4,12 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+
         {
             "name": "AVoirProject",
             "request": "launch",
             "type": "dart",
-            "program": "lib/config/main.dart"
+            "program": "lib/main.dart"
         },
         {
             "name": "AVoirProject (profile mode)",

@@ -178,8 +178,8 @@ class AddEventState extends State<AddEventPage> {
                                     });
                                   },
                                   child: Container(
-                                    width: _width / 4,
-                                    height: _height / 14,
+                                    width: 100,
+                                    height: 70,
                                     alignment: Alignment.center,
                                     decoration:
                                         BoxDecoration(color: Colors.grey[200]),
@@ -209,8 +209,8 @@ class AddEventState extends State<AddEventPage> {
                                     });
                                   },
                                   child: Container(
-                                    width: _width / 4,
-                                    height: _height / 14,
+                                    width: 100,
+                                    height: 70,
                                     alignment: Alignment.center,
                                     decoration:
                                         BoxDecoration(color: Colors.grey[200]),
@@ -352,13 +352,16 @@ class AddEventState extends State<AddEventPage> {
                                       _myEvent.npa == "" ||
                                       _myEvent.city == "") {
                                     //Error message to create
+                                    _alertDialogFill();
                                   } else {
                                     _editDatabase(context);
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => MyApp()),
-                                    );
+                                    Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AllEventPage()),
+                                        ModalRoute.withName(
+                                            Navigator.defaultRouteName));
                                   }
                                 },
                               ),
@@ -396,7 +399,7 @@ class AddEventState extends State<AddEventPage> {
         context: context,
         initialDate: selectedDate,
         initialDatePickerMode: DatePickerMode.day,
-        firstDate: DateTime(2021),
+        firstDate: DateTime.now().subtract(Duration(days: 0)),
         lastDate: DateTime(2101));
     if (picked != null)
       setState(() {
@@ -409,13 +412,34 @@ class AddEventState extends State<AddEventPage> {
 
   //used to create the time picker
   Future<String> _selectTime(BuildContext context) async {
-    final TimeOfDay? picked = await showTimePicker(
+    TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: selectedTime,
     );
+    int currentHour = TimeOfDay.fromDateTime(DateTime.now()).hour;
+    int currentMinute = TimeOfDay.fromDateTime(DateTime.now()).minute;
+
+    double pickedHour = picked?.hour.toDouble() ?? 0;
+    double pickedMinute = picked?.minute.toDouble() ?? 0;
+
+    //We transform time into double to compare
+    double? _doubleYourTime = pickedHour + (pickedMinute / 60);
+    double? _doubleNowTime = currentHour + (currentMinute / 60);
+
+    //We check if the picked date is the same as today
+    if (selectedDate.day == DateTime.now().day &&
+        selectedDate.month == DateTime.now().month &&
+        selectedDate.year == DateTime.now().year) {
+      //We check if the picked time is smaller than the actual time
+      if (_doubleYourTime < _doubleNowTime) {
+        //If it's the case we raise an alert and we display the actual time
+        _alertDialogTime();
+        picked = TimeOfDay.fromDateTime(DateTime.now());
+      }
+    }
     if (picked != null)
       setState(() {
-        selectedTime = picked;
+        selectedTime = picked!;
         _hour = selectedTime.hour.toString();
         _minute = selectedTime.minute.toString();
         _time = _hour + ' : ' + _minute;
@@ -426,6 +450,70 @@ class AddEventState extends State<AddEventPage> {
       });
 
     return _timeController.text;
+  }
+
+//Method to create an error dialog box if time is set to past
+  Future<void> _alertDialogTime() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('You cannot select a previous time'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text(
+                    'Please make sure that the selected time is in the future'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Approve',
+                style: TextStyle(color: Color(0xffa456a7)),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+//Method to create an error dialog box if textfields are empty when creating a new event
+  Future<void> _alertDialogFill() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Not all fields are correctly filled'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: const <Widget>[
+                Text(
+                    'Please make sure that every fields are filled correctly.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Approve',
+                style: TextStyle(color: Color(0xffa456a7)),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   //This method is used to update the databse. (determine if the page is in edit mode. If yes, we update the DB, if not we add in DB)

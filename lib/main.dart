@@ -23,11 +23,6 @@ class MyApp extends StatelessWidget {
         home: Scaffold(
             key: _scaffoldKey,
             resizeToAvoidBottomInset: false,
-            //the appBar is created upon reusable widget which is called appBar.dart.
-            appBar: BaseAppBar(
-              appBar: AppBar(),
-              scaffoldKey: _scaffoldKey,
-            ),
             body: AllEventPage()),
       );
     });

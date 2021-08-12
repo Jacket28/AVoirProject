@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 //This class is used as a reusable component to display the appBar.
 class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
-  static const color = Color(0xffa456a7);
+  static const color = Color(0xff643165);
   final Color backgroundColor = color;
   final AppBar appBar;
   final GlobalKey<ScaffoldState> scaffoldKey;

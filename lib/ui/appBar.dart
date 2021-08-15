@@ -13,6 +13,7 @@ class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      automaticallyImplyLeading: false,
       backgroundColor: backgroundColor,
       toolbarHeight: 70,
       title: Image.asset(

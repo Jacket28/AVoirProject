@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 //This page is used to display information about a specific event.
 class EventPage extends StatefulWidget {
@@ -20,6 +21,8 @@ class EventState extends State<EventPage> {
   //The scaffoldKey will be used later for the burger menu
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
+  SharedPreferences? prefs;
+
   String eventId = "";
   MyEvent myEvent = MyEvent(
       title: "",
@@ -28,10 +31,20 @@ class EventState extends State<EventPage> {
       npa: "",
       city: "",
       date: "",
-      time: "");
+      time: "",
+      provider: "");
+  String user = "";
 
   EventState(String eventId) {
     this.eventId = eventId;
+  }
+
+  @override
+  void initState() {
+    _setreferences(context).whenComplete(() {
+      setState(() {});
+    });
+    super.initState();
   }
 
   @override
@@ -69,33 +82,7 @@ class EventState extends State<EventPage> {
                             Padding(
                               padding: EdgeInsets.only(top: 30),
                             ),
-                            TextButton(
-                                child: Container(
-                                  height: 50,
-                                  width: 140,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.rectangle,
-                                    color: Colors.white,
-                                    borderRadius:
-                                        new BorderRadius.circular(25.0),
-                                  ),
-                                  child: Center(
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        //Will be used later to take part the event
-                                        Container(
-                                            child: new Text(
-                                          "Participate",
-                                          style: TextStyle(
-                                              color: Color(0xffa456a7),
-                                              fontSize: 20.0),
-                                        ))
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                onPressed: () {}),
+                            _addParticipateButton(context)
                           ],
                         ),
                       ),
@@ -174,21 +161,7 @@ class EventState extends State<EventPage> {
                     'Event',
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
-                  IconButton(
-                    padding: EdgeInsets.only(left: 120),
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AddEventPage(myEvent)),
-                      );
-                    },
-                    icon: Image.asset(
-                      "assets/images/pen.png",
-                      height: 100,
-                      width: 100,
-                    ),
-                  ),
+                  _addUpdateButton(context, snapshot.data!.provider)
                 ],
               ),
               Row(
@@ -219,7 +192,7 @@ class EventState extends State<EventPage> {
                               ),
                               Padding(padding: EdgeInsets.only(left: 10)),
                               Text(
-                                "Albain Dufils",
+                                user,
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
                               ),
@@ -391,6 +364,68 @@ class EventState extends State<EventPage> {
     myEvent = MyEvent.fromJson(document!);
     myEvent.id = eventId;
 
+    final DocumentSnapshot<Map<String, Object?>> user = await FirebaseFirestore
+        .instance
+        .collection("users")
+        .doc(myEvent.provider)
+        .get();
+
+    print(this.user = user.data()!['username'] as String);
+
     return myEvent;
+  }
+
+  Future<void> _setreferences(BuildContext context) async {
+    this.prefs = await SharedPreferences.getInstance();
+  }
+
+  Widget _addUpdateButton(BuildContext context, String provider) {
+    if (prefs!.getString('userId')!.compareTo(provider) == 0) {
+      return IconButton(
+        padding: EdgeInsets.only(left: 120),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => AddEventPage(myEvent)),
+          );
+        },
+        icon: Image.asset(
+          "assets/images/pen.png",
+          height: 100,
+          width: 100,
+        ),
+      );
+    }
+    return Container();
+  }
+
+  Widget _addParticipateButton(BuildContext context) {
+    if (!prefs!.getBool('isProvider')!) {
+      return TextButton(
+          child: Container(
+            height: 50,
+            width: 140,
+            decoration: BoxDecoration(
+              shape: BoxShape.rectangle,
+              color: Colors.white,
+              borderRadius: new BorderRadius.circular(25.0),
+            ),
+            child: Center(
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  //Will be used later to take part the event
+                  Container(
+                      child: new Text(
+                    "Participate",
+                    style: TextStyle(color: Color(0xffa456a7), fontSize: 20.0),
+                  ))
+                ],
+              ),
+            ),
+          ),
+          onPressed: () {});
+    }
+    return Container();
   }
 }

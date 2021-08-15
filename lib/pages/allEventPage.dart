@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 //This class is used to display all the events that are in the DB.
 class AllEventPage extends StatefulWidget {
@@ -60,6 +61,7 @@ class _AllEventState extends State<AllEventPage> {
                                       color: Colors.white, fontSize: 20),
                                 ),
                                 _getEvents(context),
+                                _addButton(context),
                               ],
                             ),
                           ),
@@ -69,122 +71,150 @@ class _AllEventState extends State<AllEventPage> {
                   ),
                 ),
                 Padding(padding: EdgeInsets.only(top: 30)),
-                TextButton(
-                  child: Container(
-                    height: 50,
-                    width: 130,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.rectangle,
-                      color: Colors.white,
-                      borderRadius: new BorderRadius.circular(25.0),
-                    ),
-                    child: Center(
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          new Image.asset('assets/images/addEvent.png',
-                              height: 25.0, width: 25.0),
-                          Container(
-                              padding: EdgeInsets.only(left: 5),
-                              child: new Text(
-                                "Add new ",
-                                style: TextStyle(
-                                    color: Color(0xffa456a7), fontSize: 20.0),
-                              ))
-                        ],
-                      ),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => AddEventPage(new MyEvent(
-                              title: "",
-                              description: "",
-                              address: "",
-                              npa: "",
-                              city: "",
-                              date: "",
-                              time: ""))),
-                    );
-                  },
-                ),
               ],
             ),
           ),
         ));
     //);
   }
-}
 
 //this method is used to get all the events from the DB.
-Widget _getEvents(BuildContext context) {
-  List<Widget> listofEvents = [];
-  return Center(
-      child: FutureBuilder(
-    future: _getEvent(context),
-    builder: (BuildContext context, AsyncSnapshot<List<Widget>> snapshot) {
-      if (snapshot.connectionState == ConnectionState.done) {
-        if (snapshot.hasData) {
-          return new Column(children: snapshot.data!);
+  Widget _getEvents(BuildContext context) {
+    return Center(
+        child: FutureBuilder(
+      future: _getEvent(context),
+      builder: (BuildContext context, AsyncSnapshot<List<Widget>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          if (snapshot.hasData) {
+            return new Column(children: snapshot.data!);
+          }
         }
-      }
-      return CircularProgressIndicator();
-    },
-  ));
-}
+        return CircularProgressIndicator();
+      },
+    ));
+  }
 
 //This method is used to build the interface of the page based uppon the gotten events from the DB.
-Future<List<Widget>> _getEvent(BuildContext context) async {
-  final CollectionReference events =
-      FirebaseFirestore.instance.collection("events");
+  Future<List<Widget>> _getEvent(BuildContext context) async {
+    final CollectionReference events =
+        FirebaseFirestore.instance.collection("events");
 
-  //we store all the events into this List.
-  List<Widget> listofEvents = [];
+    //we store all the events into this List.
+    List<Widget> listofEvents = [];
 
-  //await is necessary to wait for the asynchronous call.
-  await events.get().then((querySnapshot) {
-    querySnapshot.docs.forEach((result) {
-      listofEvents.add(new Column(children: <Widget>[
-        new Padding(
-          padding: EdgeInsets.only(top: 30),
-        ),
-      ]));
+    //await is necessary to wait for the asynchronous call.
+    await events.get().then((querySnapshot) {
+      querySnapshot.docs.forEach((result) {
+        listofEvents.add(new Column(children: <Widget>[
+          new Padding(
+            padding: EdgeInsets.only(top: 30),
+          ),
+        ]));
 
-      listofEvents.add(
-        new Container(
-          height: 70,
-          width: 200,
-          child: TextButton(
-              onPressed: () {
-                print(result.id);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => EventPage(eventId: result.id)),
-                );
-              },
-              child: Center(
-                child: Text(
-                  result.get("title"),
-                  style: TextStyle(fontSize: 20.0, color: Colors.white),
-                  textAlign: TextAlign.center,
-                ),
-              )),
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: Colors.white,
-              width: 2,
+        listofEvents.add(
+          new Container(
+            height: 70,
+            width: 200,
+            child: TextButton(
+                onPressed: () {
+                  print(result.id);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => EventPage(eventId: result.id)),
+                  );
+                },
+                child: Center(
+                  child: Text(
+                    result.get("title"),
+                    style: TextStyle(fontSize: 20.0, color: Colors.white),
+                    textAlign: TextAlign.center,
+                  ),
+                )),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Colors.white,
+                width: 2,
+              ),
+              shape: BoxShape.rectangle,
+              borderRadius: new BorderRadius.circular(25.0),
             ),
-            shape: BoxShape.rectangle,
-            borderRadius: new BorderRadius.circular(25.0),
+          ),
+        );
+      });
+    });
+    print(listofEvents);
+    await Future.delayed(Duration(seconds: 1));
+    return listofEvents;
+  }
+
+  Widget _addButton(BuildContext context) {
+    return Center(
+      child: FutureBuilder(
+        future: _setreferences(context),
+        builder:
+            (BuildContext context, AsyncSnapshot<SharedPreferences> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            print('connection done');
+            if (snapshot.hasData) {
+              print('has data');
+              if (snapshot.data!.getBool('isProvider')!) {
+                print('is provider');
+                return _addButtonVisible(context);
+              }
+            }
+          }
+          return Container();
+        },
+      ),
+    );
+  }
+
+  Future<SharedPreferences> _setreferences(BuildContext context) async {
+    return await SharedPreferences.getInstance();
+  }
+
+  Widget _addButtonVisible(BuildContext context) {
+    return TextButton(
+      child: Container(
+        height: 50,
+        width: 130,
+        decoration: BoxDecoration(
+          shape: BoxShape.rectangle,
+          color: Colors.white,
+          borderRadius: new BorderRadius.circular(25.0),
+        ),
+        child: Center(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              new Image.asset('assets/images/addEvent.png',
+                  height: 25.0, width: 25.0),
+              Container(
+                  padding: EdgeInsets.only(left: 5),
+                  child: new Text(
+                    "Add new ",
+                    style: TextStyle(color: Color(0xffa456a7), fontSize: 20.0),
+                  ))
+            ],
           ),
         ),
-      );
-    });
-  });
-  print(listofEvents);
-  await Future.delayed(Duration(seconds: 1));
-  return listofEvents;
+      ),
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => AddEventPage(new MyEvent(
+                  title: "",
+                  description: "",
+                  address: "",
+                  npa: "",
+                  city: "",
+                  date: "",
+                  time: "",
+                  provider: ""))),
+        );
+      },
+    );
+  }
 }

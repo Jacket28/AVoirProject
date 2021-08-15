@@ -7,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:date_format/date_format.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // This page is used to add new events to the DB.
 class AddEventPage extends StatefulWidget {
@@ -33,7 +34,8 @@ class AddEventState extends State<AddEventPage> {
       npa: "",
       city: "",
       date: "",
-      time: "");
+      time: "",
+      provider: "");
 
   //Used to know if the textField can be edited or not.
   bool isEditing = false;
@@ -61,6 +63,8 @@ class AddEventState extends State<AddEventPage> {
   final _locationController = TextEditingController();
   final _descriptionController = TextEditingController();
 
+  SharedPreferences? prefs;
+
   //InitSate is used to set the textFields to empty at the initialization of the page.
   @override
   void initState() {
@@ -73,6 +77,10 @@ class AddEventState extends State<AddEventPage> {
       _dateController.text = _myEvent.date;
       _timeController.text = _myEvent.time;
     }
+
+    _setreferences(context).whenComplete(() {
+      setState(() {});
+    });
     super.initState();
   }
 
@@ -532,14 +540,19 @@ class AddEventState extends State<AddEventPage> {
   }
 
   //This method is used to update the DB
-  Future<Null> _updateEventInDatabase(
+  Future<void> _updateEventInDatabase(
       BuildContext context, CollectionReference eventRefs) async {
     await eventRefs.doc(_myEvent.id).update(_myEvent.toJson());
   }
 
   //This method is used to add an event to the DB
-  Future<Null> _addEventToDatabase(
+  Future<void> _addEventToDatabase(
       BuildContext context, CollectionReference eventRefs) async {
+    _myEvent.provider = prefs!.getString('userId')!;
     await eventRefs.add(_myEvent);
+  }
+
+  Future<void> _setreferences(BuildContext context) async {
+    this.prefs = await SharedPreferences.getInstance();
   }
 }

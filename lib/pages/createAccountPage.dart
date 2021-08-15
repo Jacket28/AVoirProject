@@ -11,7 +11,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
-import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:password_validated_field/password_validated_field.dart';
 

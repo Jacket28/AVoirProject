@@ -11,6 +11,7 @@ class MyEvent {
   String city = "";
   String date = "";
   String time = "";
+  String provider = "";
 
   //Used to translate attributes to JSON for the DB.
   Map<String, Object?> toJson() {
@@ -21,7 +22,8 @@ class MyEvent {
       'npa': npa,
       'city': city,
       'date': date,
-      'time': time
+      'time': time,
+      'provider': provider
     };
   }
 
@@ -32,7 +34,8 @@ class MyEvent {
       required this.npa,
       required this.city,
       required this.date,
-      required this.time});
+      required this.time,
+      required this.provider});
 
   //Used to translate from DB.
   MyEvent.fromJson(Map<String, Object?> json)
@@ -44,6 +47,7 @@ class MyEvent {
           city: json['city']! as String,
           date: json['date']! as String,
           time: json['time']! as String,
+          provider: json['provider']! as String,
         );
 
   String get event_id {
@@ -115,5 +119,13 @@ class MyEvent {
 
   set event_time(String time) {
     this.time = time;
+  }
+
+  String get event_provider {
+    return this.provider;
+  }
+
+  set event_provider(String provider) {
+    this.provider = provider;
   }
 }

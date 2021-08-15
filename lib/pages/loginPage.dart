@@ -2,11 +2,13 @@ import 'dart:async';
 
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/pages/createAccountPage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:loader_overlay/loader_overlay.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -260,10 +262,11 @@ class LoginPageState extends State<LoginPage> {
               title: Text("Ops! Login Failed"), content: Text('${e.message}')));
     }
     if (_isLoginCorrect == true) {
+      _setreferences(context, mail);
       context.loaderOverlay.show();
       ButtonSuccess();
       ButtonReset();
-      Timer(Duration(milliseconds: 100), () {
+      Timer(Duration(milliseconds: 500), () {
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => AllEventPage()),
@@ -272,6 +275,22 @@ class LoginPageState extends State<LoginPage> {
       });
     }
   }
+}
+
+Future<void> _setreferences(BuildContext context, String email) async {
+  final prefs = await SharedPreferences.getInstance();
+
+  await FirebaseFirestore.instance
+      .collection("users")
+      .where('email', isEqualTo: email)
+      .get()
+      .then((value) {
+    prefs.setString('userId', value.docs.single.id);
+    prefs.setBool('isProvider', value.docs.single.get('isServiceProvider'));
+  });
+
+  print(prefs.getString('userId'));
+  print(prefs.getBool('isProvider'));
 }
 
 class HomePage {}

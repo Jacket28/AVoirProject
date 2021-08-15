@@ -1,6 +1,4 @@
-import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/pages/loginPage.dart';
-import 'package:a_voir_app/ui/appBar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 

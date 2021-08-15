@@ -2,6 +2,7 @@ import 'package:a_voir_app/main.dart';
 import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
+import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -83,7 +84,9 @@ class AddEventState extends State<AddEventPage> {
     dateTime = DateFormat.yMd().format(DateTime.now());
     return new Scaffold(
       key: _scaffoldKey,
-      resizeToAvoidBottomInset: false,
+      //Used to avoid keyboard to go over Input fields
+      resizeToAvoidBottomInset: true,
+      endDrawer: DrawerMenu(),
       //the appBar is created upon reusable widget which is called appBar.dart.
       appBar: BaseAppBar(
         appBar: AppBar(),
@@ -115,7 +118,7 @@ class AddEventState extends State<AddEventPage> {
                             ),
                             Text(
                               //Title section
-                              "* Title (3 words max.)",
+                              "Title",
                               style:
                                   TextStyle(color: Colors.white, fontSize: 20),
                             ),
@@ -123,9 +126,12 @@ class AddEventState extends State<AddEventPage> {
                                 padding: EdgeInsets.only(
                                     top: 20, left: 100, right: 100),
                                 child: TextField(
+                                    maxLength: 30,
                                     controller: _titleController,
                                     style: TextStyle(color: Colors.white),
                                     decoration: InputDecoration(
+                                        counterStyle:
+                                            TextStyle(color: Colors.white),
                                         hintStyle:
                                             TextStyle(color: Colors.grey),
                                         enabledBorder: new OutlineInputBorder(
@@ -153,7 +159,7 @@ class AddEventState extends State<AddEventPage> {
                                         EdgeInsets.only(top: 10, left: 65)),
                                 Text(
                                   //Date section
-                                  "* Date",
+                                  "Date",
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 20),
                                 ),
@@ -162,7 +168,7 @@ class AddEventState extends State<AddEventPage> {
                                         EdgeInsets.only(top: 100, left: 145)),
                                 Text(
                                   //time section
-                                  "* Time",
+                                  "Time",
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 20),
                                 ),
@@ -182,7 +188,7 @@ class AddEventState extends State<AddEventPage> {
                                     height: 70,
                                     alignment: Alignment.center,
                                     decoration:
-                                        BoxDecoration(color: Colors.grey[200]),
+                                        BoxDecoration(color: Colors.white),
                                     child: TextFormField(
                                       style: TextStyle(fontSize: 20),
                                       textAlign: TextAlign.center,
@@ -192,7 +198,6 @@ class AddEventState extends State<AddEventPage> {
                                       decoration: InputDecoration(
                                           disabledBorder: UnderlineInputBorder(
                                               borderSide: BorderSide.none),
-                                          // labelText: 'Time',
                                           contentPadding:
                                               EdgeInsets.only(top: 0)),
                                       onChanged: (text) {
@@ -238,7 +243,7 @@ class AddEventState extends State<AddEventPage> {
                               ),
                               Text(
                                 //Location section
-                                "* Location",
+                                "Location",
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
                               ),
@@ -294,6 +299,8 @@ class AddEventState extends State<AddEventPage> {
                                   maxLength: 300,
                                   style: TextStyle(color: Colors.white),
                                   decoration: InputDecoration(
+                                      counterStyle:
+                                          TextStyle(color: Colors.white),
                                       hintStyle: TextStyle(color: Colors.grey),
                                       enabledBorder: new OutlineInputBorder(
                                         borderRadius:
@@ -350,7 +357,8 @@ class AddEventState extends State<AddEventPage> {
                                       _myEvent.title == "" ||
                                       _myEvent.address == "" ||
                                       _myEvent.npa == "" ||
-                                      _myEvent.city == "") {
+                                      _myEvent.city == "" "" ||
+                                      _myEvent.description == "") {
                                     //Error message to create
                                     _alertDialogFill();
                                   } else {

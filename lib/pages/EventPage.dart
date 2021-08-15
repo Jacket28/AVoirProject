@@ -1,6 +1,7 @@
 import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:a_voir_app/pages/addEventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
+import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
@@ -53,6 +54,7 @@ class EventState extends State<EventPage> {
       key: _scaffoldKey,
       resizeToAvoidBottomInset: false,
       //the appBar is created upon reusable widget which is called appBar.dart.
+      endDrawer: DrawerMenu(),
       appBar: BaseAppBar(
         appBar: AppBar(),
         scaffoldKey: _scaffoldKey,

@@ -9,7 +9,10 @@
             "name": "AVoirProject",
             "request": "launch",
             "type": "dart",
-            "program": "lib/main.dart"
+            "program": "lib/main.dart",
+            "args": [
+                "--no-sound-null-safety"
+               ]
         },
         {
             "name": "AVoirProject (profile mode)",
@@ -18,4 +21,5 @@
             "flutterMode": "profile"
         }
     ]
+    
 }

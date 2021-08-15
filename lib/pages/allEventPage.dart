@@ -2,6 +2,7 @@ import 'package:a_voir_app/pages/addEventPage.dart';
 import 'package:a_voir_app/pages/EventPage.dart';
 import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:a_voir_app/ui/appBar.dart';
+import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -24,6 +25,7 @@ class _AllEventState extends State<AllEventPage> {
         child: Scaffold(
           key: _scaffoldKey,
           resizeToAvoidBottomInset: false,
+          endDrawer: DrawerMenu(),
           appBar: BaseAppBar(
             appBar: AppBar(),
             scaffoldKey: _scaffoldKey,

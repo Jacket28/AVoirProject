@@ -1,6 +1,7 @@
 import 'package:a_voir_app/main.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 //This class is used as a reusable component to display the appBar.
 class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
@@ -158,7 +159,9 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
             )),
             Container(
                 child: TextButton(
-              onPressed: () {
+              onPressed: () async {
+                var test = await SharedPreferences.getInstance();
+                test.clear();
                 Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(builder: (context) => MyApp()),

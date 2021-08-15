@@ -41,6 +41,7 @@ dependencies:
   rounded_loading_button: ^2.0.3
   crypto: ^3.0.1
   password_validated_field: ^0.0.3
+  firebase_auth_web: ^3.0.0
 
 
 

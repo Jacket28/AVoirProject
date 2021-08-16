@@ -207,14 +207,15 @@ class _AllEventState extends State<AllEventPage> {
           context,
           MaterialPageRoute(
               builder: (context) => AddEventPage(new MyEvent(
-                  title: "",
-                  description: "",
-                  address: "",
-                  npa: "",
-                  city: "",
-                  date: "",
-                  time: "",
-                  provider: ""))),
+                    title: "",
+                    description: "",
+                    address: "",
+                    npa: "",
+                    city: "",
+                    date: "",
+                    time: "",
+                    provider: "",
+                  ))),
         );
       },
     );

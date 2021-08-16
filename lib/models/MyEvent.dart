@@ -12,6 +12,7 @@ class MyEvent {
   String date = "";
   String time = "";
   String provider = "";
+  List<String> attendees = [];
 
   //Used to translate attributes to JSON for the DB.
   Map<String, Object?> toJson() {
@@ -23,32 +24,33 @@ class MyEvent {
       'city': city,
       'date': date,
       'time': time,
-      'provider': provider
+      'provider': provider,
+      'attendees': attendees
     };
   }
 
-  MyEvent(
-      {required this.title,
-      required this.description,
-      required this.address,
-      required this.npa,
-      required this.city,
-      required this.date,
-      required this.time,
-      required this.provider});
+  MyEvent({
+    required this.title,
+    required this.description,
+    required this.address,
+    required this.npa,
+    required this.city,
+    required this.date,
+    required this.time,
+    required this.provider,
+  });
 
   //Used to translate from DB.
   MyEvent.fromJson(Map<String, Object?> json)
       : this(
-          title: json['title']! as String,
-          description: json['description']! as String,
-          address: json['address']! as String,
-          npa: json['npa']! as String,
-          city: json['city']! as String,
-          date: json['date']! as String,
-          time: json['time']! as String,
-          provider: json['provider']! as String,
-        );
+            title: json['title']! as String,
+            description: json['description']! as String,
+            address: json['address']! as String,
+            npa: json['npa']! as String,
+            city: json['city']! as String,
+            date: json['date']! as String,
+            time: json['time']! as String,
+            provider: json['provider']! as String);
 
   String get event_id {
     return id;
@@ -127,5 +129,13 @@ class MyEvent {
 
   set event_provider(String provider) {
     this.provider = provider;
+  }
+
+  List<String> get event_attendees {
+    return this.attendees;
+  }
+
+  set event_attendees(List<String> attendees) {
+    this.attendees = attendees;
   }
 }

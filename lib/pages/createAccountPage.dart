@@ -30,6 +30,8 @@ class CreateAccountState extends State<CreateAccountPage> {
 
   bool _validPassword = false;
 
+  var uid;
+
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
 
@@ -296,7 +298,8 @@ class CreateAccountState extends State<CreateAccountPage> {
                                         });
                                         _validPassword = true;
                                         username = _usernameController.text;
-                                        email = _mailController.text;
+                                        email =
+                                            _mailController.text.toLowerCase();
                                         password = _passwordController.text;
                                         registration();
                                       } else {
@@ -346,6 +349,8 @@ class CreateAccountState extends State<CreateAccountPage> {
             fromFirestore: (snapshot, _) => MyUser.fromJson(snapshot.data()!),
             toFirestore: (user, _) => user.toJson(),
           );
+
+      uid = userCredential.user!.uid;
       _addUserToDatabase(context, userRefs);
     } on FirebaseAuthException catch (e) {
       ButtonFail();
@@ -386,6 +391,8 @@ class CreateAccountState extends State<CreateAccountPage> {
 
   Future<Null> _addUserToDatabase(
       BuildContext context, CollectionReference userRefs) async {
-    await userRefs.add(_myUser);
+    print(uid);
+    await userRefs.doc(uid).set(_myUser);
+    //userRefs.add(_myUser);
   }
 }

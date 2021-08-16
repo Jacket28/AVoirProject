@@ -2,11 +2,15 @@ import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:a_voir_app/pages/addEventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
+import 'package:a_voir_app/ui/myTooltip.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'allEventPage.dart';
 
 //This page is used to display information about a specific event.
 class EventPage extends StatefulWidget {
@@ -26,14 +30,15 @@ class EventState extends State<EventPage> {
 
   String eventId = "";
   MyEvent myEvent = MyEvent(
-      title: "",
-      description: "",
-      address: "",
-      npa: "",
-      city: "",
-      date: "",
-      time: "",
-      provider: "");
+    title: "",
+    description: "",
+    address: "",
+    npa: "",
+    city: "",
+    date: "",
+    time: "",
+    provider: "",
+  );
   String user = "";
 
   EventState(String eventId) {
@@ -426,8 +431,104 @@ class EventState extends State<EventPage> {
               ),
             ),
           ),
-          onPressed: () {});
+          onPressed: () async {
+            bool isAttending = await isAlreadyParticipating();
+            if (!isAttending) {
+              //Participate button action
+              showParticipateAlertDialog(context);
+            } else {
+              MyTooltip(
+                message: "You're already in this event !",
+                child: Container(),
+              );
+            }
+          });
     }
     return Container();
+  }
+
+  Future<bool> isAlreadyParticipating() async {
+    User user = await FirebaseAuth.instance.currentUser!;
+    var uidConnectedUser = user.uid;
+
+    String username = await getUsername();
+
+    bool alreadyParticipating = false;
+
+    var collection = FirebaseFirestore.instance.collection('events');
+    await collection
+        .where("attendees", arrayContainsAny: [username])
+        .get()
+        .then((value) {
+          if (alreadyParticipating == value.docs.isEmpty) {
+            alreadyParticipating = true;
+          }
+        });
+
+    return alreadyParticipating;
+  }
+
+  Future<String> getUsername() async {
+    User user = await FirebaseAuth.instance.currentUser!;
+    var uidConnectedUser = user.uid;
+
+    String value = "";
+
+    var collection = FirebaseFirestore.instance.collection('users');
+    var docSnapshot = await collection.doc(uidConnectedUser).get();
+    if (docSnapshot.exists) {
+      Map<String, dynamic>? data = docSnapshot.data();
+
+      // You can then retrieve the value from the Map like this:
+      value = data?['username'];
+    }
+    return value;
+  }
+
+  showParticipateAlertDialog(BuildContext context) async {
+    String username = await getUsername();
+
+    // set up the buttons
+    Widget cancelButton = TextButton(
+      child: Text("Cancel", style: TextStyle(color: Colors.red)),
+      onPressed: () {
+        Navigator.of(context).pop();
+      },
+    );
+    Widget continueButton = TextButton(
+      child: Text("Approve", style: TextStyle(color: Color(0xffa456a7))),
+      onPressed: () {
+        var attendeesRef =
+            FirebaseFirestore.instance.collection("events").doc(eventId);
+        attendeesRef.update({
+          "attendees": FieldValue.arrayUnion(<String>[username])
+        });
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => AllEventPage()),
+            ModalRoute.withName(Navigator.defaultRouteName));
+      },
+    );
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Participate"),
+      content: Text(
+        "Would you like to participate to this event ?",
+        style: TextStyle(color: Color(0xffa456a7)),
+      ),
+      actions: [
+        cancelButton,
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 }

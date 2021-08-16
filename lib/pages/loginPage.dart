@@ -275,6 +275,29 @@ class LoginPageState extends State<LoginPage> {
       });
     }
   }
+
+/*
+  someMethod() async {
+    User user = await FirebaseAuth.instance.currentUser!;
+    var connectedUser = user.email;
+
+    String name;
+
+    var usernameCollection = FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: connectedUser)
+        .get()
+        .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+            // doc.data() is never undefined for query doc snapshots
+            console.log(doc.id, " => ", doc.data());
+        });
+    })
+
+
+    return name;
+  }
+  */
 }
 
 Future<void> _setreferences(BuildContext context, String email) async {

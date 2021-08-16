@@ -29,14 +29,15 @@ class AddEventState extends State<AddEventPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   MyEvent _myEvent = new MyEvent(
-      title: "",
-      description: "",
-      address: "",
-      npa: "",
-      city: "",
-      date: "",
-      time: "",
-      provider: "");
+    title: "",
+    description: "",
+    address: "",
+    npa: "",
+    city: "",
+    date: "",
+    time: "",
+    provider: "",
+  );
 
   //Used to know if the textField can be edited or not.
   bool isEditing = false;

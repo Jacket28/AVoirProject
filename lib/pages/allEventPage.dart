@@ -3,8 +3,11 @@ import 'package:a_voir_app/pages/EventPage.dart';
 import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
+import 'package:a_voir_app/ui/bottomAppBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:pandabar/pandabar.dart';
+import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,6 +23,8 @@ class _AllEventState extends State<AllEventPage> {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+
     return new WillPopScope(
         onWillPop: () async => false,
         child: Scaffold(
@@ -31,51 +36,28 @@ class _AllEventState extends State<AllEventPage> {
             scaffoldKey: _scaffoldKey,
           ),
           backgroundColor: Color(0xffa456a7),
-          body: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                Padding(
-                  padding: EdgeInsets.only(top: 20),
-                ),
-                Padding(padding: EdgeInsets.only(top: 50)),
-                Center(
+          body: LayoutBuilder(
+              builder: (BuildContext context, BoxConstraints constraints) {
+            return Column(
+              children: [
+                Expanded(
                   child: SingleChildScrollView(
-                    scrollDirection: Axis.vertical,
                     child: Column(
-                      children: <Widget>[
-                        Column(children: <Widget>[
-                          Container(
-                            padding: EdgeInsets.only(bottom: 50),
-                            width: 300,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.rectangle,
-                              color: Color(0xff643165),
-                              borderRadius: new BorderRadius.circular(25.0),
-                            ),
-                            child: Column(
-                              children: <Widget>[
-                                Padding(
-                                  padding: EdgeInsets.only(top: 30),
-                                ),
-                                Text(
-                                  "All events",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 20),
-                                ),
-                                _getEvents(context),
-                              ],
-                            ),
-                          ),
-                          _addButton(context),
-                        ]),
+                      children: [
+                        _getEvents(context),
                       ],
                     ),
                   ),
                 ),
-                Padding(padding: EdgeInsets.only(top: 30)),
+                _addButton(context),
               ],
-            ),
-          ),
+            );
+
+            /*SingleChildScrollView(
+            child: Column(
+          children: [_getEvents(context), _addButton(context)],
+        )),*/
+          }),
         ));
     //);
   }
@@ -107,13 +89,42 @@ class _AllEventState extends State<AllEventPage> {
     //await is necessary to wait for the asynchronous call.
     await events.get().then((querySnapshot) {
       querySnapshot.docs.forEach((result) {
-        listofEvents.add(new Column(children: <Widget>[
-          new Padding(
-            padding: EdgeInsets.only(top: 30),
-          ),
-        ]));
-
-        listofEvents.add(
+        listofEvents.add(Center(
+            child: TextButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => EventPage(eventId: result.id)),
+                  );
+                },
+                child: Container(
+                    alignment: Alignment.topCenter,
+                    width: 500,
+                    height: 300,
+                    margin: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Color(0xff643165),
+                      border: Border.all(color: Colors.white),
+                      shape: BoxShape.rectangle,
+                      borderRadius: new BorderRadius.circular(25.0),
+                    ),
+                    child: Column(children: [
+                      Padding(padding: EdgeInsets.only(top: 10)),
+                      Text(
+                        result.get("title"),
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                      ),
+                      Container(
+                        padding: EdgeInsets.only(top: 10),
+                        width: 300,
+                        height: 200,
+                        child: Transform.scale(
+                          scale: 1,
+                          child: Image.network(result.get("url")),
+                        ),
+                      ),
+                      /* 
           new Container(
             height: 70,
             width: 200,
@@ -142,7 +153,8 @@ class _AllEventState extends State<AllEventPage> {
               borderRadius: new BorderRadius.circular(25.0),
             ),
           ),
-        );
+          */
+                    ])))));
       });
     });
     print(listofEvents);
@@ -166,7 +178,8 @@ class _AllEventState extends State<AllEventPage> {
               }
             }
           }
-          return Container();
+
+          return Container(color: Colors.transparent);
         },
       ),
     );
@@ -177,47 +190,6 @@ class _AllEventState extends State<AllEventPage> {
   }
 
   Widget _addButtonVisible(BuildContext context) {
-    return TextButton(
-      child: Container(
-        height: 50,
-        width: 130,
-        decoration: BoxDecoration(
-          shape: BoxShape.rectangle,
-          color: Colors.white,
-          borderRadius: new BorderRadius.circular(25.0),
-        ),
-        child: Center(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              new Image.asset('assets/images/addEvent.png',
-                  height: 25.0, width: 25.0),
-              Container(
-                  padding: EdgeInsets.only(left: 5),
-                  child: new Text(
-                    "Add new ",
-                    style: TextStyle(color: Color(0xffa456a7), fontSize: 20.0),
-                  ))
-            ],
-          ),
-        ),
-      ),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => AddEventPage(new MyEvent(
-                    title: "",
-                    description: "",
-                    address: "",
-                    npa: "",
-                    city: "",
-                    date: "",
-                    time: "",
-                    provider: "",
-                  ))),
-        );
-      },
-    );
+    return Container(height: 100, width: 600, child: BottomNavBarV2());
   }
 }

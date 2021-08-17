@@ -1,11 +1,16 @@
+import 'dart:io';
+
 import 'package:a_voir_app/main.dart';
 import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:date_format/date_format.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,7 +18,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 // This page is used to add new events to the DB.
 class AddEventPage extends StatefulWidget {
   AddEventPage(this._myEvent);
-
   MyEvent _myEvent;
 
   @override
@@ -37,10 +41,16 @@ class AddEventState extends State<AddEventPage> {
     date: "",
     time: "",
     provider: "",
+    attendees: [],
+    url: "",
   );
 
   //Used to know if the textField can be edited or not.
   bool isEditing = false;
+
+  File? _pickedImage = null;
+
+  String url = "";
 
   double _height = 0;
   double _width = 0;
@@ -185,7 +195,7 @@ class AddEventState extends State<AddEventPage> {
                             ),
                             Row(
                               children: <Widget>[
-                                Padding(padding: EdgeInsets.only(left: 50)),
+                                Padding(padding: EdgeInsets.only(left: 40)),
                                 InkWell(
                                   onTap: () {
                                     _selectDate(context).then((value) {
@@ -215,7 +225,7 @@ class AddEventState extends State<AddEventPage> {
                                     ),
                                   ),
                                 ),
-                                Padding(padding: EdgeInsets.only(left: 100)),
+                                Padding(padding: EdgeInsets.only(left: 90)),
                                 InkWell(
                                   onTap: () {
                                     _selectTime(context).then((value) {
@@ -333,7 +343,37 @@ class AddEventState extends State<AddEventPage> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(top: 30),
+                                padding: EdgeInsets.only(top: 20),
+                              ),
+                              Text(
+                                //Description of the events section
+                                "Picture",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(top: 20),
+                              ),
+                              TextButton(
+                                  onPressed: () async {
+                                    _pickImageGallery();
+                                  },
+                                  child: Container(
+                                    height: 150,
+                                    width: 200,
+                                    child: _pickedImage != null
+                                        ? Image.file(_pickedImage!,
+                                            fit: BoxFit.fill)
+                                        : Text(''),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.rectangle,
+                                      color: Colors.white,
+                                      borderRadius:
+                                          new BorderRadius.circular(25.0),
+                                    ),
+                                  )),
+                              Padding(
+                                padding: EdgeInsets.only(top: 20),
                               ),
                               TextButton(
                                 child: Container(
@@ -360,17 +400,20 @@ class AddEventState extends State<AddEventPage> {
                                     ),
                                   ),
                                 ),
-                                onPressed: () {
+                                onPressed: () async {
                                   if (_myEvent.date == "" ||
                                       _myEvent.time == "" ||
                                       _myEvent.title == "" ||
                                       _myEvent.address == "" ||
                                       _myEvent.npa == "" ||
                                       _myEvent.city == "" "" ||
-                                      _myEvent.description == "") {
+                                      _myEvent.description == "" ||
+                                      _pickedImage == null) {
                                     //Error message to create
                                     _alertDialogFill();
                                   } else {
+                                    _myEvent.url =
+                                        await SendImageToFirebase(context);
                                     _editDatabase(context);
                                     Navigator.pushAndRemoveUntil(
                                         context,
@@ -396,6 +439,26 @@ class AddEventState extends State<AddEventPage> {
         ),
       ),
     );
+  }
+
+  void _pickImageGallery() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.getImage(source: ImageSource.gallery);
+    final pickedImageFile = File(pickedImage!.path);
+    setState(() {
+      _pickedImage = pickedImageFile;
+    });
+  }
+
+  Future<String> SendImageToFirebase(BuildContext context) async {
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child("eventImages")
+        .child(_myEvent.title + ".jpg");
+    await ref.putFile(_pickedImage!);
+    url = await ref.getDownloadURL();
+
+    return url;
   }
 
   //Submit button

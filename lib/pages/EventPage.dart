@@ -38,6 +38,8 @@ class EventState extends State<EventPage> {
     date: "",
     time: "",
     provider: "",
+    attendees: [],
+    url: "",
   );
   String user = "";
 
@@ -55,90 +57,62 @@ class EventState extends State<EventPage> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      key: _scaffoldKey,
-      resizeToAvoidBottomInset: false,
-      //the appBar is created upon reusable widget which is called appBar.dart.
-      endDrawer: DrawerMenu(),
-      appBar: BaseAppBar(
-        appBar: AppBar(),
-        scaffoldKey: _scaffoldKey,
-      ),
-      backgroundColor: Color(0xffa456a7),
-      body: SingleChildScrollView(
-        child: Column(
-          children: <Widget>[
-            Padding(padding: EdgeInsets.only(top: 10, bottom: 40)),
-            Center(
-              child: SingleChildScrollView(
-                scrollDirection: Axis.vertical,
-                child: Column(
-                  children: <Widget>[
-                    Column(children: <Widget>[
-                      Container(
-                        padding: EdgeInsets.only(bottom: 50),
-                        width: 380,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          color: Color(0xff643165),
-                          borderRadius: new BorderRadius.circular(25.0),
-                        ),
-                        child: Column(
-                          children: <Widget>[
-                            _getEvent(context),
-                            Padding(
-                              padding: EdgeInsets.only(top: 30),
+    return new WillPopScope(
+        onWillPop: () {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => AllEventPage()),
+              ModalRoute.withName(Navigator.defaultRouteName));
+          return Future.value(false);
+        },
+        child: Scaffold(
+          key: _scaffoldKey,
+          resizeToAvoidBottomInset: false,
+          //the appBar is created upon reusable widget which is called appBar.dart.
+          endDrawer: DrawerMenu(),
+          appBar: BaseAppBar(
+            appBar: AppBar(),
+            scaffoldKey: _scaffoldKey,
+          ),
+          backgroundColor: Color(0xffa456a7),
+          body: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Padding(padding: EdgeInsets.only(top: 10, bottom: 40)),
+                Center(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.vertical,
+                    child: Column(
+                      children: <Widget>[
+                        Column(children: <Widget>[
+                          Container(
+                            padding: EdgeInsets.only(bottom: 50),
+                            width: 380,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              color: Color(0xff643165),
+                              borderRadius: new BorderRadius.circular(25.0),
                             ),
-                            _addParticipateButton(context)
-                          ],
-                        ),
-                      ),
-                    ]),
-                  ],
-                ),
-              ),
-            ),
-            Padding(padding: EdgeInsets.only(top: 30)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  //Method used to get all the attendants of an event (will be used later with the DB)
-  Widget getAttendants() {
-    List<Widget> listofAttendants = [];
-
-    for (var i = 0; i < 3; i++) {
-      listofAttendants.add(Row(children: <Widget>[
-        Expanded(
-          child: Container(
-              padding: EdgeInsets.only(left: 70),
-              child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {},
-                    child: Container(
-                      child: Row(
-                        children: <Widget>[
-                          Row(children: <Widget>[
-                            CircleAvatar(
-                              radius: 10,
-                              backgroundColor: Colors.white,
-                              backgroundImage: NetworkImage(
-                                  "https://cdn.icon-icons.com/icons2/1812/PNG/512/4213460-account-avatar-head-person-profile-user_115386.png"),
+                            child: Column(
+                              children: <Widget>[
+                                _getEvent(context),
+                                Padding(
+                                  padding: EdgeInsets.only(top: 30),
+                                ),
+                                _addParticipateButton(context)
+                              ],
                             ),
-                            Padding(
-                                padding: EdgeInsets.only(left: 10, top: 50)),
-                          ]),
-                        ],
-                      ),
+                          ),
+                        ]),
+                      ],
                     ),
-                  ))),
-        ),
-      ]));
-    }
-    return new Column(children: listofAttendants);
+                  ),
+                ),
+                Padding(padding: EdgeInsets.only(top: 30)),
+              ],
+            ),
+          ),
+        ));
   }
 
   //Method used to get an event from the DB.
@@ -210,7 +184,7 @@ class EventState extends State<EventPage> {
                 ],
               ),
               Row(
-                children: <Widget>[
+                children: [
                   Padding(
                     padding: EdgeInsets.only(left: 20, top: 40),
                   ),
@@ -322,14 +296,13 @@ class EventState extends State<EventPage> {
                   ),
                 ),
               ]),
-
               Row(
                 children: <Widget>[
                   Padding(
                     padding: EdgeInsets.only(left: 50, top: 30),
                   ),
                   Container(
-                    padding: EdgeInsets.only(top: 20, bottom: 20, left: 80),
+                    padding: EdgeInsets.only(top: 20, bottom: 10, left: 80),
                     child: Text(
                       //attendants section
                       "Attendants : ",
@@ -341,10 +314,15 @@ class EventState extends State<EventPage> {
                   ),
                 ],
               ),
-              Padding(
-                padding: EdgeInsets.only(top: 10),
-              ),
-              //getAttendants()
+              FutureBuilder(
+                  future: getAttendants(context),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Widget>> snapshot) {
+                    if (!snapshot.hasData) {
+                      return CircularProgressIndicator();
+                    }
+                    return new Column(children: snapshot.data!);
+                  })
             ]);
           }
           print("I have no data");
@@ -437,10 +415,7 @@ class EventState extends State<EventPage> {
               //Participate button action
               showParticipateAlertDialog(context);
             } else {
-              MyTooltip(
-                message: "You're already in this event !",
-                child: Container(),
-              );
+              AlreadyParticipating(context);
             }
           });
     }
@@ -455,15 +430,19 @@ class EventState extends State<EventPage> {
 
     bool alreadyParticipating = false;
 
-    var collection = FirebaseFirestore.instance.collection('events');
-    await collection
-        .where("attendees", arrayContainsAny: [username])
-        .get()
-        .then((value) {
-          if (alreadyParticipating == value.docs.isEmpty) {
-            alreadyParticipating = true;
-          }
-        });
+    var documentTest = await FirebaseFirestore.instance
+        .collection("events")
+        .doc(myEvent.id)
+        .get();
+
+    var test =
+        List.from(documentTest['attendees'] as List).contains('testUser');
+
+    print(documentTest);
+
+    if (test == true) {
+      alreadyParticipating = true;
+    }
 
     return alreadyParticipating;
   }
@@ -483,6 +462,37 @@ class EventState extends State<EventPage> {
       value = data?['username'];
     }
     return value;
+  }
+
+  AlreadyParticipating(BuildContext context) async {
+    String username = await getUsername();
+
+    // set up the buttons
+    Widget continueButton = TextButton(
+        child: Text("OK", style: TextStyle(color: Color(0xffa456a7))),
+        onPressed: () {
+          Navigator.pop(context);
+        });
+
+    // set up the AlertDialog
+    AlertDialog alert = AlertDialog(
+      title: Text("Participate"),
+      content: Text(
+        "You are already participating to this event !",
+        style: TextStyle(color: Color(0xffa456a7)),
+      ),
+      actions: [
+        continueButton,
+      ],
+    );
+
+    // show the dialog
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return alert;
+      },
+    );
   }
 
   showParticipateAlertDialog(BuildContext context) async {
@@ -530,5 +540,64 @@ class EventState extends State<EventPage> {
         return alert;
       },
     );
+  }
+
+  Future<List<dynamic>> getAttendeesFromDB() async {
+    List<dynamic> listOfAttendees = [];
+    await FirebaseFirestore.instance
+        .collection('events')
+        .doc(myEvent.id)
+        .get()
+        .then((doc) {
+      var test2 = List.from(doc["attendees"]);
+      for (int i = 0; i < test2.length; i++) {
+        listOfAttendees.add(test2[i]);
+      }
+    });
+    return listOfAttendees;
+  }
+
+  Future<List<Widget>> getAttendants(BuildContext context) async {
+    List test = await getAttendeesFromDB();
+    myEvent.attendees = test;
+    List<Widget> listofAttendants = [];
+
+    for (var i = 0; i < test.length; i++) {
+      listofAttendants.add(Row(children: <Widget>[
+        Expanded(
+          child: Container(
+              padding: EdgeInsets.only(left: 110),
+              child: Material(
+                  color: Colors.transparent,
+                  child: InkWell(
+                    onTap: () {
+                      print("salut");
+                    },
+                    child: Container(
+                      padding: EdgeInsets.only(top: 10),
+                      child: Row(
+                        children: <Widget>[
+                          Row(children: <Widget>[
+                            CircleAvatar(
+                              radius: 20,
+                              backgroundColor: Colors.white,
+                              backgroundImage: NetworkImage(
+                                  "https://cdn.icon-icons.com/icons2/1812/PNG/512/4213460-account-avatar-head-person-profile-user_115386.png"),
+                            ),
+                            Padding(
+                                padding: EdgeInsets.only(left: 10, top: 50)),
+                          ]),
+                          Text(
+                            test[i].toString(),
+                            style: TextStyle(color: Colors.white, fontSize: 18),
+                          )
+                        ],
+                      ),
+                    ),
+                  ))),
+        ),
+      ]));
+    }
+    return listofAttendants;
   }
 }

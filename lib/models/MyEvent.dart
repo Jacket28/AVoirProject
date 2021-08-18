@@ -11,6 +11,9 @@ class MyEvent {
   String city = "";
   String date = "";
   String time = "";
+  String provider = "";
+  List<dynamic> attendees = [];
+  String url = "";
 
   //Used to translate attributes to JSON for the DB.
   Map<String, Object?> toJson() {
@@ -21,18 +24,25 @@ class MyEvent {
       'npa': npa,
       'city': city,
       'date': date,
-      'time': time
+      'time': time,
+      'provider': provider,
+      'attendees': attendees,
+      'url': url,
     };
   }
 
-  MyEvent(
-      {required this.title,
-      required this.description,
-      required this.address,
-      required this.npa,
-      required this.city,
-      required this.date,
-      required this.time});
+  MyEvent({
+    required this.title,
+    required this.description,
+    required this.address,
+    required this.npa,
+    required this.city,
+    required this.date,
+    required this.time,
+    required this.provider,
+    required this.attendees,
+    required this.url,
+  });
 
   //Used to translate from DB.
   MyEvent.fromJson(Map<String, Object?> json)
@@ -44,6 +54,9 @@ class MyEvent {
           city: json['city']! as String,
           date: json['date']! as String,
           time: json['time']! as String,
+          provider: json['provider']! as String,
+          attendees: json['attendees']! as List<dynamic>,
+          url: json['url']! as String,
         );
 
   String get event_id {
@@ -115,5 +128,29 @@ class MyEvent {
 
   set event_time(String time) {
     this.time = time;
+  }
+
+  String get event_provider {
+    return this.provider;
+  }
+
+  set event_provider(String provider) {
+    this.provider = provider;
+  }
+
+  List<dynamic> get event_attendees {
+    return this.attendees;
+  }
+
+  set event_attendees(List<dynamic> attendees) {
+    this.attendees = attendees;
+  }
+
+  String get event_url {
+    return this.url;
+  }
+
+  set event_url(String url) {
+    this.url = url;
   }
 }

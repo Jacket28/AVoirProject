@@ -1,18 +1,26 @@
-import 'package:a_voir_app/main.dart';
+import 'dart:io';
+
 import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
+import 'package:a_voir_app/ui/drawerMenu.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:date_format/date_format.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // This page is used to add new events to the DB.
 class AddEventPage extends StatefulWidget {
   AddEventPage(this._myEvent);
-
-  MyEvent _myEvent;
+  final MyEvent _myEvent;
 
   @override
   AddEventState createState() => AddEventState(_myEvent);
@@ -27,21 +35,24 @@ class AddEventState extends State<AddEventPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
   MyEvent _myEvent = new MyEvent(
-      title: "",
-      description: "",
-      address: "",
-      npa: "",
-      city: "",
-      date: "",
-      time: "");
+    title: "",
+    description: "",
+    address: "",
+    npa: "",
+    city: "",
+    date: "",
+    time: "",
+    provider: "",
+    attendees: [],
+    url: "",
+  );
 
   //Used to know if the textField can be edited or not.
   bool isEditing = false;
 
-  double _height = 0;
-  double _width = 0;
+  File? _pickedImage;
 
-  String _setTime = "";
+  String url = "";
 
   String _hour = "";
   String _minute = "";
@@ -61,6 +72,8 @@ class AddEventState extends State<AddEventPage> {
   final _locationController = TextEditingController();
   final _descriptionController = TextEditingController();
 
+  SharedPreferences? prefs;
+
   //InitSate is used to set the textFields to empty at the initialization of the page.
   @override
   void initState() {
@@ -73,17 +86,21 @@ class AddEventState extends State<AddEventPage> {
       _dateController.text = _myEvent.date;
       _timeController.text = _myEvent.time;
     }
+
+    _setreferences(context).whenComplete(() {
+      setState(() {});
+    });
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    _height = MediaQuery.of(context).size.height;
-    _width = MediaQuery.of(context).size.width;
     dateTime = DateFormat.yMd().format(DateTime.now());
     return new Scaffold(
       key: _scaffoldKey,
-      resizeToAvoidBottomInset: false,
+      //Used to avoid keyboard to go over Input fields
+      resizeToAvoidBottomInset: true,
+      endDrawer: DrawerMenu(),
       //the appBar is created upon reusable widget which is called appBar.dart.
       appBar: BaseAppBar(
         appBar: AppBar(),
@@ -115,7 +132,7 @@ class AddEventState extends State<AddEventPage> {
                             ),
                             Text(
                               //Title section
-                              "* Title (3 words max.)",
+                              "Title",
                               style:
                                   TextStyle(color: Colors.white, fontSize: 20),
                             ),
@@ -123,9 +140,12 @@ class AddEventState extends State<AddEventPage> {
                                 padding: EdgeInsets.only(
                                     top: 20, left: 100, right: 100),
                                 child: TextField(
+                                    maxLength: 30,
                                     controller: _titleController,
                                     style: TextStyle(color: Colors.white),
                                     decoration: InputDecoration(
+                                        counterStyle:
+                                            TextStyle(color: Colors.white),
                                         hintStyle:
                                             TextStyle(color: Colors.grey),
                                         enabledBorder: new OutlineInputBorder(
@@ -153,7 +173,7 @@ class AddEventState extends State<AddEventPage> {
                                         EdgeInsets.only(top: 10, left: 65)),
                                 Text(
                                   //Date section
-                                  "* Date",
+                                  "Date",
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 20),
                                 ),
@@ -162,7 +182,7 @@ class AddEventState extends State<AddEventPage> {
                                         EdgeInsets.only(top: 100, left: 145)),
                                 Text(
                                   //time section
-                                  "* Time",
+                                  "Time",
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 20),
                                 ),
@@ -170,7 +190,7 @@ class AddEventState extends State<AddEventPage> {
                             ),
                             Row(
                               children: <Widget>[
-                                Padding(padding: EdgeInsets.only(left: 50)),
+                                Padding(padding: EdgeInsets.only(left: 40)),
                                 InkWell(
                                   onTap: () {
                                     _selectDate(context).then((value) {
@@ -182,7 +202,7 @@ class AddEventState extends State<AddEventPage> {
                                     height: 70,
                                     alignment: Alignment.center,
                                     decoration:
-                                        BoxDecoration(color: Colors.grey[200]),
+                                        BoxDecoration(color: Colors.white),
                                     child: TextFormField(
                                       style: TextStyle(fontSize: 20),
                                       textAlign: TextAlign.center,
@@ -192,7 +212,6 @@ class AddEventState extends State<AddEventPage> {
                                       decoration: InputDecoration(
                                           disabledBorder: UnderlineInputBorder(
                                               borderSide: BorderSide.none),
-                                          // labelText: 'Time',
                                           contentPadding:
                                               EdgeInsets.only(top: 0)),
                                       onChanged: (text) {
@@ -201,7 +220,7 @@ class AddEventState extends State<AddEventPage> {
                                     ),
                                   ),
                                 ),
-                                Padding(padding: EdgeInsets.only(left: 100)),
+                                Padding(padding: EdgeInsets.only(left: 90)),
                                 InkWell(
                                   onTap: () {
                                     _selectTime(context).then((value) {
@@ -238,7 +257,7 @@ class AddEventState extends State<AddEventPage> {
                               ),
                               Text(
                                 //Location section
-                                "* Location",
+                                "Location",
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
                               ),
@@ -294,6 +313,8 @@ class AddEventState extends State<AddEventPage> {
                                   maxLength: 300,
                                   style: TextStyle(color: Colors.white),
                                   decoration: InputDecoration(
+                                      counterStyle:
+                                          TextStyle(color: Colors.white),
                                       hintStyle: TextStyle(color: Colors.grey),
                                       enabledBorder: new OutlineInputBorder(
                                         borderRadius:
@@ -317,7 +338,37 @@ class AddEventState extends State<AddEventPage> {
                                 ),
                               ),
                               Padding(
-                                padding: EdgeInsets.only(top: 30),
+                                padding: EdgeInsets.only(top: 20),
+                              ),
+                              Text(
+                                //Description of the events section
+                                "Picture",
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(top: 20),
+                              ),
+                              TextButton(
+                                  onPressed: () async {
+                                    _pickImageGallery();
+                                  },
+                                  child: Container(
+                                    height: 150,
+                                    width: 200,
+                                    child: _pickedImage != null
+                                        ? Image.file(_pickedImage!,
+                                            fit: BoxFit.fill)
+                                        : Text(''),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.rectangle,
+                                      color: Colors.white,
+                                      borderRadius:
+                                          new BorderRadius.circular(25.0),
+                                    ),
+                                  )),
+                              Padding(
+                                padding: EdgeInsets.only(top: 20),
                               ),
                               TextButton(
                                 child: Container(
@@ -344,16 +395,20 @@ class AddEventState extends State<AddEventPage> {
                                     ),
                                   ),
                                 ),
-                                onPressed: () {
+                                onPressed: () async {
                                   if (_myEvent.date == "" ||
                                       _myEvent.time == "" ||
                                       _myEvent.title == "" ||
                                       _myEvent.address == "" ||
                                       _myEvent.npa == "" ||
-                                      _myEvent.city == "") {
+                                      _myEvent.city == "" "" ||
+                                      _myEvent.description == "" ||
+                                      _pickedImage == null) {
                                     //Error message to create
                                     _alertDialogFill();
                                   } else {
+                                    _myEvent.url =
+                                        await _sendImageToFirebase(context);
                                     _editDatabase(context);
                                     Navigator.pushAndRemoveUntil(
                                         context,
@@ -379,6 +434,26 @@ class AddEventState extends State<AddEventPage> {
         ),
       ),
     );
+  }
+
+  void _pickImageGallery() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.getImage(source: ImageSource.gallery);
+    final pickedImageFile = File(pickedImage!.path);
+    setState(() {
+      _pickedImage = pickedImageFile;
+    });
+  }
+
+  Future<String> _sendImageToFirebase(BuildContext context) async {
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child("eventImages")
+        .child(_myEvent.title + ".jpg");
+    await ref.putFile(_pickedImage!);
+    url = await ref.getDownloadURL();
+
+    return url;
   }
 
   //Submit button
@@ -532,14 +607,19 @@ class AddEventState extends State<AddEventPage> {
   }
 
   //This method is used to update the DB
-  Future<Null> _updateEventInDatabase(
+  Future<void> _updateEventInDatabase(
       BuildContext context, CollectionReference eventRefs) async {
     await eventRefs.doc(_myEvent.id).update(_myEvent.toJson());
   }
 
   //This method is used to add an event to the DB
-  Future<Null> _addEventToDatabase(
+  Future<void> _addEventToDatabase(
       BuildContext context, CollectionReference eventRefs) async {
+    _myEvent.provider = prefs!.getString('userId')!;
     await eventRefs.add(_myEvent);
+  }
+
+  Future<void> _setreferences(BuildContext context) async {
+    this.prefs = await SharedPreferences.getInstance();
   }
 }

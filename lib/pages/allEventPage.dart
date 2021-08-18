@@ -6,8 +6,6 @@ import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:a_voir_app/ui/bottomAppBar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pandabar/pandabar.dart';
-import 'package:convex_bottom_bar/convex_bottom_bar.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:a_voir_app/main.dart';
 import 'package:a_voir_app/models/MyUser.dart';
 import 'package:a_voir_app/pages/loginPage.dart';
 import 'package:a_voir_app/ui/myTooltip.dart';
@@ -49,7 +48,7 @@ class CreateAccountState extends State<CreateAccountPage> {
   var password = "";
   var username = "";
 
-  File? _pickedImage = null;
+  File? _pickedImage;
 
   bool _isCreationAccountCorrect = true;
 
@@ -288,8 +287,6 @@ class CreateAccountState extends State<CreateAccountPage> {
                                         onChanged: (value) {
                                           setState(() {
                                             serviceProvider = value;
-                                            print("SWITCH VALUE :");
-                                            print(serviceProvider);
                                             _myUser.isServiceProvider =
                                                 serviceProvider;
                                           });
@@ -319,7 +316,7 @@ class CreateAccountState extends State<CreateAccountPage> {
                                         if (_formkey.currentState!.validate() &&
                                             _pickedImage != null) {
                                           _myUser.url =
-                                              await SendImageToFirebase(
+                                              await _sendImageToFirebase(
                                                   context);
                                           setState(() {
                                             _isCreationAccountCorrect = true;
@@ -357,8 +354,8 @@ class CreateAccountState extends State<CreateAccountPage> {
                                               return alert;
                                             },
                                           );
-                                          ButtonFail();
-                                          ButtonReset();
+                                          _buttonFail();
+                                          _buttonReset();
                                         }
                                       }),
                                 ),
@@ -381,7 +378,7 @@ class CreateAccountState extends State<CreateAccountPage> {
     });
   }
 
-  Future<String> SendImageToFirebase(BuildContext context) async {
+  Future<String> _sendImageToFirebase(BuildContext context) async {
     final ref = FirebaseStorage.instance
         .ref()
         .child("userImages")
@@ -392,19 +389,19 @@ class CreateAccountState extends State<CreateAccountPage> {
     return url;
   }
 
-  void ButtonSuccess() async {
+  void _buttonSuccess() async {
     Timer(Duration(seconds: 3), () {
       _btnController.success();
     });
   }
 
-  void ButtonFail() async {
+  void _buttonFail() async {
     Timer(Duration(seconds: 1), () {
       _btnController.error();
     });
   }
 
-  void ButtonReset() async {
+  void _buttonReset() async {
     Timer(Duration(seconds: 3), () {
       _btnController.reset();
     });
@@ -414,7 +411,6 @@ class CreateAccountState extends State<CreateAccountPage> {
     try {
       UserCredential userCredential = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-      print(userCredential);
       CollectionReference userRefs = FirebaseFirestore.instance
           .collection('users')
           .withConverter<MyUser>(
@@ -425,8 +421,8 @@ class CreateAccountState extends State<CreateAccountPage> {
       uid = userCredential.user!.uid;
       _addUserToDatabase(context, userRefs);
     } on FirebaseAuthException catch (e) {
-      ButtonFail();
-      ButtonReset();
+      _buttonFail();
+      _buttonReset();
       _isCreationAccountCorrect = false;
       showDialog(
           context: context,
@@ -449,8 +445,8 @@ class CreateAccountState extends State<CreateAccountPage> {
             )),
       );
       context.loaderOverlay.show();
-      ButtonSuccess();
-      ButtonReset();
+      _buttonSuccess();
+      _buttonReset();
       Timer(Duration(seconds: 1), () {
         Navigator.pushAndRemoveUntil(
             context,
@@ -463,8 +459,6 @@ class CreateAccountState extends State<CreateAccountPage> {
 
   Future<Null> _addUserToDatabase(
       BuildContext context, CollectionReference userRefs) async {
-    print(uid);
     await userRefs.doc(uid).set(_myUser);
-    //userRefs.add(_myUser);
   }
 }

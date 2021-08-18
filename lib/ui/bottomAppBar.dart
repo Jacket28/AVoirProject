@@ -1,5 +1,4 @@
 import 'package:a_voir_app/models/MyEvent.dart';
-import 'package:a_voir_app/pages/EventPage.dart';
 import 'package:a_voir_app/pages/addEventPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +31,7 @@ class _BottomNavBarV2State extends State<BottomNavBarV2> {
               width: size.width,
               height: 80,
               child: Stack(
-                overflow: Overflow.visible,
+                clipBehavior: Clip.none,
                 children: [
                   CustomPaint(
                     size: Size(size.width, 80),

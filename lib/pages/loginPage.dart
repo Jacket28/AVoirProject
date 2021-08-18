@@ -33,7 +33,6 @@ class LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    var isVisible = context.loaderOverlay.visible;
     return new WillPopScope(
         onWillPop: () async => false,
         child: LoaderOverlay(
@@ -167,11 +166,11 @@ class LoginPageState extends State<LoginPage> {
                                           ],
                                         )),
                                   );
-                                  Login();
-                                  ButtonReset();
+                                  _login();
+                                  _buttonReset();
                                 } else {
-                                  ButtonFail();
-                                  ButtonReset();
+                                  _buttonFail();
+                                  _buttonReset();
                                 }
                               },
                             ),
@@ -190,9 +189,7 @@ class LoginPageState extends State<LoginPage> {
                   children: [
                     TextButton(
                       onPressed: () async {
-                        setState(() {
-                          isVisible = true;
-                        });
+                        setState(() {});
                         cptButton = 1;
                         Timer(Duration(milliseconds: 1000), () {
                           if (buttonEnabled == true && cptButton == 1) {
@@ -221,7 +218,7 @@ class LoginPageState extends State<LoginPage> {
         )));
   }
 
-  void ButtonSuccess() async {
+  void _buttonSuccess() async {
     Timer(Duration(seconds: 1), () {
       _btnController.success();
       buttonEnabled = true;
@@ -231,13 +228,13 @@ class LoginPageState extends State<LoginPage> {
     });
   }
 
-  void ButtonFail() async {
+  void _buttonFail() async {
     Timer(Duration(seconds: 1), () {
       _btnController.error();
     });
   }
 
-  void ButtonReset() async {
+  void _buttonReset() async {
     Timer(Duration(seconds: 3), () {
       _btnController.reset();
       buttonEnabled = true;
@@ -247,14 +244,13 @@ class LoginPageState extends State<LoginPage> {
     });
   }
 
-  Login() async {
+  _login() async {
     try {
-      UserCredential userCredential = await FirebaseAuth.instance
+      await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: mail, password: password);
-      print(userCredential);
     } on FirebaseAuthException catch (e) {
-      ButtonFail();
-      ButtonReset();
+      _buttonFail();
+      _buttonReset();
       _isLoginCorrect = false;
       showDialog(
           context: context,
@@ -264,8 +260,8 @@ class LoginPageState extends State<LoginPage> {
     if (_isLoginCorrect == true) {
       _setreferences(context, mail);
       context.loaderOverlay.show();
-      ButtonSuccess();
-      ButtonReset();
+      _buttonSuccess();
+      _buttonReset();
       Timer(Duration(milliseconds: 500), () {
         Navigator.push(
           context,
@@ -275,29 +271,6 @@ class LoginPageState extends State<LoginPage> {
       });
     }
   }
-
-/*
-  someMethod() async {
-    User user = await FirebaseAuth.instance.currentUser!;
-    var connectedUser = user.email;
-
-    String name;
-
-    var usernameCollection = FirebaseFirestore.instance
-        .collection('users')
-        .where('email', isEqualTo: connectedUser)
-        .get()
-        .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-            // doc.data() is never undefined for query doc snapshots
-            console.log(doc.id, " => ", doc.data());
-        });
-    })
-
-
-    return name;
-  }
-  */
 }
 
 Future<void> _setreferences(BuildContext context, String email) async {
@@ -311,9 +284,6 @@ Future<void> _setreferences(BuildContext context, String email) async {
     prefs.setString('userId', value.docs.single.id);
     prefs.setBool('isProvider', value.docs.single.get('isServiceProvider'));
   });
-
-  print(prefs.getString('userId'));
-  print(prefs.getBool('isProvider'));
 }
 
 class HomePage {}

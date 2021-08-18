@@ -1,9 +1,8 @@
-import 'package:a_voir_app/pages/addEventPage.dart';
 import 'package:a_voir_app/pages/EventPage.dart';
-import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:a_voir_app/ui/bottomAppBar.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -21,8 +20,6 @@ class _AllEventState extends State<AllEventPage> {
 
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-
     return new WillPopScope(
         onWillPop: () async => false,
         child: Scaffold(
@@ -50,14 +47,8 @@ class _AllEventState extends State<AllEventPage> {
                 _addButton(context),
               ],
             );
-
-            /*SingleChildScrollView(
-            child: Column(
-          children: [_getEvents(context), _addButton(context)],
-        )),*/
           }),
         ));
-    //);
   }
 
 //this method is used to get all the events from the DB.
@@ -122,40 +113,9 @@ class _AllEventState extends State<AllEventPage> {
                           child: Image.network(result.get("url")),
                         ),
                       ),
-                      /* 
-          new Container(
-            height: 70,
-            width: 200,
-            child: TextButton(
-                onPressed: () {
-                  print(result.id);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => EventPage(eventId: result.id)),
-                  );
-                },
-                child: Center(
-                  child: Text(
-                    result.get("title"),
-                    style: TextStyle(fontSize: 20.0, color: Colors.white),
-                    textAlign: TextAlign.center,
-                  ),
-                )),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Colors.white,
-                width: 2,
-              ),
-              shape: BoxShape.rectangle,
-              borderRadius: new BorderRadius.circular(25.0),
-            ),
-          ),
-          */
                     ])))));
       });
     });
-    print(listofEvents);
     await Future.delayed(Duration(seconds: 1));
     return listofEvents;
   }
@@ -167,11 +127,8 @@ class _AllEventState extends State<AllEventPage> {
         builder:
             (BuildContext context, AsyncSnapshot<SharedPreferences> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            print('connection done');
             if (snapshot.hasData) {
-              print('has data');
               if (snapshot.data!.getBool('isProvider')!) {
-                print('is provider');
                 return _addButtonVisible(context);
               }
             }

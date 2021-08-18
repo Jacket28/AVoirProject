@@ -1,15 +1,17 @@
 import 'dart:io';
 
-import 'package:a_voir_app/main.dart';
 import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:date_format/date_format.dart';
@@ -18,7 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 // This page is used to add new events to the DB.
 class AddEventPage extends StatefulWidget {
   AddEventPage(this._myEvent);
-  MyEvent _myEvent;
+  final MyEvent _myEvent;
 
   @override
   AddEventState createState() => AddEventState(_myEvent);
@@ -48,14 +50,9 @@ class AddEventState extends State<AddEventPage> {
   //Used to know if the textField can be edited or not.
   bool isEditing = false;
 
-  File? _pickedImage = null;
+  File? _pickedImage;
 
   String url = "";
-
-  double _height = 0;
-  double _width = 0;
-
-  String _setTime = "";
 
   String _hour = "";
   String _minute = "";
@@ -98,8 +95,6 @@ class AddEventState extends State<AddEventPage> {
 
   @override
   Widget build(BuildContext context) {
-    _height = MediaQuery.of(context).size.height;
-    _width = MediaQuery.of(context).size.width;
     dateTime = DateFormat.yMd().format(DateTime.now());
     return new Scaffold(
       key: _scaffoldKey,
@@ -413,7 +408,7 @@ class AddEventState extends State<AddEventPage> {
                                     _alertDialogFill();
                                   } else {
                                     _myEvent.url =
-                                        await SendImageToFirebase(context);
+                                        await _sendImageToFirebase(context);
                                     _editDatabase(context);
                                     Navigator.pushAndRemoveUntil(
                                         context,
@@ -450,7 +445,7 @@ class AddEventState extends State<AddEventPage> {
     });
   }
 
-  Future<String> SendImageToFirebase(BuildContext context) async {
+  Future<String> _sendImageToFirebase(BuildContext context) async {
     final ref = FirebaseStorage.instance
         .ref()
         .child("eventImages")

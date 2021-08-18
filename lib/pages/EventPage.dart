@@ -2,7 +2,6 @@ import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:a_voir_app/pages/addEventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
-import 'package:a_voir_app/ui/myTooltip.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -123,9 +122,7 @@ class EventState extends State<EventPage> {
       builder: (BuildContext context, AsyncSnapshot<MyEvent> snapshot) {
         //this condition is used to handle errors
         if (snapshot.connectionState == ConnectionState.done) {
-          print("Connection done");
           if (snapshot.hasData) {
-            print("I have data");
             return new Column(children: <Widget>[
               Row(
                 children: <Widget>[
@@ -318,10 +315,10 @@ class EventState extends State<EventPage> {
                   })
             ]);
           }
-          print("I have no data");
+
           return CircularProgressIndicator();
         }
-        print("Connection failed");
+
         return DotsIndicator(dotsCount: 3);
       },
     ));
@@ -337,8 +334,6 @@ class EventState extends State<EventPage> {
 
     final Map<String, Object?>? document = event.data();
 
-    print(document);
-
     myEvent = MyEvent.fromJson(document!);
     myEvent.id = eventId;
 
@@ -348,7 +343,7 @@ class EventState extends State<EventPage> {
         .doc(myEvent.provider)
         .get();
 
-    print(this.user = user.data()!['username'] as String);
+    this.user = user.data()!['username'] as String;
 
     return myEvent;
   }
@@ -408,7 +403,7 @@ class EventState extends State<EventPage> {
               //Participate button action
               showParticipateAlertDialog(context);
             } else {
-              AlreadyParticipating(context);
+              _alreadyParticipating(context);
             }
           });
     }
@@ -416,11 +411,6 @@ class EventState extends State<EventPage> {
   }
 
   Future<bool> isAlreadyParticipating() async {
-    User user = await FirebaseAuth.instance.currentUser!;
-    var uidConnectedUser = user.uid;
-
-    String username = await getUsername();
-
     bool alreadyParticipating = false;
 
     var documentTest = await FirebaseFirestore.instance
@@ -431,8 +421,6 @@ class EventState extends State<EventPage> {
     var test =
         List.from(documentTest['attendees'] as List).contains('testUser');
 
-    print(documentTest);
-
     if (test == true) {
       alreadyParticipating = true;
     }
@@ -441,7 +429,7 @@ class EventState extends State<EventPage> {
   }
 
   Future<String> getUsername() async {
-    User user = await FirebaseAuth.instance.currentUser!;
+    User user = FirebaseAuth.instance.currentUser!;
     var uidConnectedUser = user.uid;
 
     String value = "";
@@ -457,9 +445,7 @@ class EventState extends State<EventPage> {
     return value;
   }
 
-  AlreadyParticipating(BuildContext context) async {
-    String username = await getUsername();
-
+  _alreadyParticipating(BuildContext context) async {
     // set up the buttons
     Widget continueButton = TextButton(
         child: Text("OK", style: TextStyle(color: Color(0xffa456a7))),
@@ -563,9 +549,7 @@ class EventState extends State<EventPage> {
               child: Material(
                   color: Colors.transparent,
                   child: InkWell(
-                    onTap: () {
-                      print("salut");
-                    },
+                    onTap: () {},
                     child: Container(
                       padding: EdgeInsets.only(top: 10),
                       child: Row(

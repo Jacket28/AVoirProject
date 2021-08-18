@@ -1,7 +1,5 @@
 import 'dart:core';
 
-import 'dart:io';
-
 //This class is used to interact with the events objects in the firebase database
 class MyEvent {
   String id = "";

@@ -1,5 +1,3 @@
-import 'package:a_voir_app/main.dart';
-import 'package:a_voir_app/models/MyUser.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/pages/loginPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,9 +17,7 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
               color: Color(0xff643165),
               child: Column(children: <Widget>[
                 InkWell(
-                  onTap: () {
-                    print("salut");
-                  },
+                  onTap: () {},
                   child: UserAccountsDrawerHeader(
                       decoration: BoxDecoration(color: Color(0xffa456a7)),
                       accountName: FutureBuilder(
@@ -218,7 +214,7 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Future<String> getUsername() async {
-    User user = await FirebaseAuth.instance.currentUser!;
+    User user = FirebaseAuth.instance.currentUser!;
     var uidConnectedUser = user.uid;
 
     String value = "";
@@ -235,7 +231,7 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
   }
 
   Future<String> getAvatar() async {
-    User user = await FirebaseAuth.instance.currentUser!;
+    User user = FirebaseAuth.instance.currentUser!;
     var uidConnectedUser = user.uid;
 
     String value = "";
@@ -252,6 +248,5 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  // TODO: implement preferredSize
   Size get preferredSize => throw UnimplementedError();
 }

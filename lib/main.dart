@@ -26,7 +26,6 @@ class MyApp extends StatelessWidget {
           if (snapshot.data!.getString('userId') != null) {
             page = AllEventPage();
           } else {
-            print('no user detected');
             page = LoginPage();
           }
           return MaterialApp(

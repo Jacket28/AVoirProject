@@ -1,5 +1,7 @@
 import 'dart:core';
 
+import 'dart:io';
+
 //This class is used to interact with the events objects in the firebase database
 class MyEvent {
   String id = "";
@@ -12,6 +14,8 @@ class MyEvent {
   String date = "";
   String time = "";
   String provider = "";
+  List<dynamic> attendees = [];
+  String url = "";
 
   //Used to translate attributes to JSON for the DB.
   Map<String, Object?> toJson() {
@@ -23,19 +27,24 @@ class MyEvent {
       'city': city,
       'date': date,
       'time': time,
-      'provider': provider
+      'provider': provider,
+      'attendees': attendees,
+      'url': url,
     };
   }
 
-  MyEvent(
-      {required this.title,
-      required this.description,
-      required this.address,
-      required this.npa,
-      required this.city,
-      required this.date,
-      required this.time,
-      required this.provider});
+  MyEvent({
+    required this.title,
+    required this.description,
+    required this.address,
+    required this.npa,
+    required this.city,
+    required this.date,
+    required this.time,
+    required this.provider,
+    required this.attendees,
+    required this.url,
+  });
 
   //Used to translate from DB.
   MyEvent.fromJson(Map<String, Object?> json)
@@ -48,6 +57,8 @@ class MyEvent {
           date: json['date']! as String,
           time: json['time']! as String,
           provider: json['provider']! as String,
+          attendees: json['attendees']! as List<dynamic>,
+          url: json['url']! as String,
         );
 
   String get event_id {
@@ -127,5 +138,21 @@ class MyEvent {
 
   set event_provider(String provider) {
     this.provider = provider;
+  }
+
+  List<dynamic> get event_attendees {
+    return this.attendees;
+  }
+
+  set event_attendees(List<dynamic> attendees) {
+    this.attendees = attendees;
+  }
+
+  String get event_url {
+    return this.url;
+  }
+
+  set event_url(String url) {
+    this.url = url;
   }
 }

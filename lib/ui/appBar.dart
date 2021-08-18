@@ -21,7 +21,12 @@ class BaseAppBar extends StatelessWidget implements PreferredSizeWidget {
         height: 150,
         width: 150,
       ),
-      leading: Image.asset("assets/images/logo.png"),
+      leading: Container(
+        padding: EdgeInsets.only(left: 10),
+        child: Image.asset(
+          "assets/images/logo.png",
+        ),
+      ),
       actions: [
         IconButton(
             icon: Icon(Icons.menu),

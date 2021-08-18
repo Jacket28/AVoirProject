@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:a_voir_app/main.dart';
 import 'package:a_voir_app/models/MyUser.dart';
@@ -7,8 +8,10 @@ import 'package:a_voir_app/pages/loginPage.dart';
 import 'package:a_voir_app/ui/myTooltip.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:crypto/crypto.dart';
@@ -26,9 +29,13 @@ class CreateAccountState extends State<CreateAccountPage> {
     username: "",
     isServiceProvider: false,
     isSubscribed: false,
+    url: "",
   );
+  String url = "";
 
   bool _validPassword = false;
+
+  var uid;
 
   final RoundedLoadingButtonController _btnController =
       RoundedLoadingButtonController();
@@ -41,6 +48,8 @@ class CreateAccountState extends State<CreateAccountPage> {
   var email = "";
   var password = "";
   var username = "";
+
+  File? _pickedImage = null;
 
   bool _isCreationAccountCorrect = true;
 
@@ -79,6 +88,22 @@ class CreateAccountState extends State<CreateAccountPage> {
                         key: _formkey,
                         child: Column(
                           children: <Widget>[
+                            TextButton(
+                                onPressed: () async {
+                                  _pickImageGallery();
+                                },
+                                child: Container(
+                                  height: 150,
+                                  width: 200,
+                                  child: _pickedImage != null
+                                      ? Image.file(_pickedImage!,
+                                          fit: BoxFit.fill)
+                                      : Text(''),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.white,
+                                  ),
+                                )),
                             Padding(
                               //padding: const EdgeInsets.only(left:15.0,right: 15.0,top:0,bottom: 0),
                               padding: EdgeInsets.symmetric(
@@ -284,28 +309,58 @@ class CreateAccountState extends State<CreateAccountPage> {
                                     borderRadius: BorderRadius.circular(25)),
                                 child: Center(
                                   child: RoundedLoadingButton(
-                                    color: Color(0xffa456a7),
-                                    child: Text('Create your account !',
-                                        style: TextStyle(
-                                            color: Colors.white, fontSize: 15)),
-                                    controller: _btnController,
-                                    onPressed: () {
-                                      if (_formkey.currentState!.validate()) {
-                                        setState(() {
-                                          _isCreationAccountCorrect = true;
-                                        });
-                                        _validPassword = true;
-                                        username = _usernameController.text;
-                                        email = _mailController.text;
-                                        password = _passwordController.text;
-                                        registration();
-                                      } else {
-                                        _validPassword = false;
-                                        ButtonFail();
-                                        ButtonReset();
-                                      }
-                                    },
-                                  ),
+                                      color: Color(0xffa456a7),
+                                      child: Text('Create your account !',
+                                          style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15)),
+                                      controller: _btnController,
+                                      onPressed: () async {
+                                        if (_formkey.currentState!.validate() &&
+                                            _pickedImage != null) {
+                                          _myUser.url =
+                                              await SendImageToFirebase(
+                                                  context);
+                                          setState(() {
+                                            _isCreationAccountCorrect = true;
+                                          });
+                                          _validPassword = true;
+                                          username = _usernameController.text;
+                                          email = _mailController.text
+                                              .toLowerCase();
+                                          password = _passwordController.text;
+                                          registration();
+                                        } else {
+                                          _validPassword = false;
+
+                                          AlertDialog alert = AlertDialog(
+                                            title: Text("Creating account"),
+                                            content: Text(
+                                              "Check everything as been filled !",
+                                              style: TextStyle(
+                                                  color: Color(0xffa456a7)),
+                                            ),
+                                            actions: [
+                                              TextButton(
+                                                  child: Text("OK",
+                                                      style: TextStyle(
+                                                          color: Color(
+                                                              0xffa456a7))),
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  }),
+                                            ],
+                                          );
+                                          showDialog(
+                                            context: context,
+                                            builder: (BuildContext context) {
+                                              return alert;
+                                            },
+                                          );
+                                          ButtonFail();
+                                          ButtonReset();
+                                        }
+                                      }),
                                 ),
                               ),
                             ),
@@ -315,6 +370,26 @@ class CreateAccountState extends State<CreateAccountPage> {
                 ),
               ),
             )));
+  }
+
+  void _pickImageGallery() async {
+    final picker = ImagePicker();
+    final pickedImage = await picker.getImage(source: ImageSource.gallery);
+    final pickedImageFile = File(pickedImage!.path);
+    setState(() {
+      _pickedImage = pickedImageFile;
+    });
+  }
+
+  Future<String> SendImageToFirebase(BuildContext context) async {
+    final ref = FirebaseStorage.instance
+        .ref()
+        .child("userImages")
+        .child(_myUser.username + ".jpg");
+    await ref.putFile(_pickedImage!);
+    url = await ref.getDownloadURL();
+
+    return url;
   }
 
   void ButtonSuccess() async {
@@ -346,6 +421,8 @@ class CreateAccountState extends State<CreateAccountPage> {
             fromFirestore: (snapshot, _) => MyUser.fromJson(snapshot.data()!),
             toFirestore: (user, _) => user.toJson(),
           );
+
+      uid = userCredential.user!.uid;
       _addUserToDatabase(context, userRefs);
     } on FirebaseAuthException catch (e) {
       ButtonFail();
@@ -377,7 +454,7 @@ class CreateAccountState extends State<CreateAccountPage> {
       Timer(Duration(seconds: 1), () {
         Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => MyApp()),
+            MaterialPageRoute(builder: (context) => LoginPage()),
             ModalRoute.withName(Navigator.defaultRouteName));
       });
       context.loaderOverlay.hide();
@@ -386,6 +463,8 @@ class CreateAccountState extends State<CreateAccountPage> {
 
   Future<Null> _addUserToDatabase(
       BuildContext context, CollectionReference userRefs) async {
-    await userRefs.add(_myUser);
+    print(uid);
+    await userRefs.doc(uid).set(_myUser);
+    //userRefs.add(_myUser);
   }
 }

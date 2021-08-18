@@ -11,6 +11,8 @@ class MyUser {
   bool isServiceProvider;
   bool isSubscribed;
 
+  String url = "";
+
   //Used to translate attributes to JSON for the DB.
   Map<String, Object?> toJson() {
     return {
@@ -19,6 +21,7 @@ class MyUser {
       'password': password,
       'isServiceProvider': isServiceProvider,
       'isSubscribed': isSubscribed,
+      'url': url,
     };
   }
 
@@ -28,6 +31,7 @@ class MyUser {
     required this.password,
     required this.isServiceProvider,
     required this.isSubscribed,
+    required this.url,
   });
 
   //Used to translate from DB.
@@ -38,6 +42,7 @@ class MyUser {
           password: json['password']! as String,
           isServiceProvider: json['isServiceProvider']! as bool,
           isSubscribed: json['isSubscribed']! as bool,
+          url: json['url'] as String,
         );
 
   String get user_id {
@@ -93,5 +98,13 @@ class MyUser {
 
   set user_isSubscribed(bool isSubscribed) {
     this.isSubscribed = isSubscribed;
+  }
+
+  String get user_url {
+    return url;
+  }
+
+  set user_url(String url) {
+    this.url = url;
   }
 }

@@ -42,9 +42,7 @@ dependencies:
   crypto: ^3.0.1
   password_validated_field: ^0.0.3
   firebase_auth_web: ^3.0.0
-  pandabar: ^0.1.1
   firebase_storage: ^10.0.2
-  convex_bottom_bar: ^3.0.0
 
 
 

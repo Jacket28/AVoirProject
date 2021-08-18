@@ -165,13 +165,6 @@ class EventState extends State<EventPage> {
                         child: Container(
                           child: Row(
                             children: <Widget>[
-                              CircleAvatar(
-                                radius: 10,
-                                backgroundColor: Colors.white,
-                                backgroundImage: NetworkImage(
-                                    "https://cdn.icon-icons.com/icons2/1812/PNG/512/4213460-account-avatar-head-person-profile-user_115386.png"),
-                              ),
-                              Padding(padding: EdgeInsets.only(left: 10)),
                               Text(
                                 user,
                                 style: TextStyle(
@@ -578,14 +571,7 @@ class EventState extends State<EventPage> {
                       child: Row(
                         children: <Widget>[
                           Row(children: <Widget>[
-                            CircleAvatar(
-                              radius: 20,
-                              backgroundColor: Colors.white,
-                              backgroundImage: NetworkImage(
-                                  "https://cdn.icon-icons.com/icons2/1812/PNG/512/4213460-account-avatar-head-person-profile-user_115386.png"),
-                            ),
-                            Padding(
-                                padding: EdgeInsets.only(left: 10, top: 50)),
+                            Padding(padding: EdgeInsets.only(left: 40))
                           ]),
                           Text(
                             test[i].toString(),

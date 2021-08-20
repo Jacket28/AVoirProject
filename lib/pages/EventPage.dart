@@ -373,41 +373,38 @@ class EventState extends State<EventPage> {
   }
 
   Widget _addParticipateButton(BuildContext context) {
-    if (!prefs!.getBool('isProvider')!) {
-      return TextButton(
-          child: Container(
-            height: 50,
-            width: 140,
-            decoration: BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: Colors.white,
-              borderRadius: new BorderRadius.circular(25.0),
-            ),
-            child: Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  //Will be used later to take part the event
-                  Container(
-                      child: new Text(
-                    "Participate",
-                    style: TextStyle(color: Color(0xffa456a7), fontSize: 20.0),
-                  ))
-                ],
-              ),
+    return TextButton(
+        child: Container(
+          height: 50,
+          width: 140,
+          decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            color: Colors.white,
+            borderRadius: new BorderRadius.circular(25.0),
+          ),
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                //Will be used later to take part the event
+                Container(
+                    child: new Text(
+                  "Participate",
+                  style: TextStyle(color: Color(0xffa456a7), fontSize: 20.0),
+                ))
+              ],
             ),
           ),
-          onPressed: () async {
-            bool isAttending = await isAlreadyParticipating();
-            if (!isAttending) {
-              //Participate button action
-              showParticipateAlertDialog(context);
-            } else {
-              _alreadyParticipating(context);
-            }
-          });
-    }
-    return Container();
+        ),
+        onPressed: () async {
+          bool isAttending = await isAlreadyParticipating();
+          if (!isAttending) {
+            //Participate button action
+            showParticipateAlertDialog(context);
+          } else {
+            _alreadyParticipating(context);
+          }
+        });
   }
 
   Future<bool> isAlreadyParticipating() async {
@@ -418,8 +415,8 @@ class EventState extends State<EventPage> {
         .doc(myEvent.id)
         .get();
 
-    var test =
-        List.from(documentTest['attendees'] as List).contains('testUser');
+    var test = List.from(documentTest['attendees'] as List)
+        .contains(await getUsername());
 
     if (test == true) {
       alreadyParticipating = true;
@@ -429,8 +426,7 @@ class EventState extends State<EventPage> {
   }
 
   Future<String> getUsername() async {
-    User user = FirebaseAuth.instance.currentUser!;
-    var uidConnectedUser = user.uid;
+    var uidConnectedUser = prefs!.getString('userId');
 
     String value = "";
 

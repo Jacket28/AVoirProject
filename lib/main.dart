@@ -39,6 +39,6 @@ class MyApp extends StatelessWidget {
   }
 
   Future<SharedPreferences> _testRefs(BuildContext context) async {
-    return SharedPreferences.getInstance();
+    return await SharedPreferences.getInstance();
   }
 }

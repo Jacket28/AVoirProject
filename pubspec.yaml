@@ -43,6 +43,7 @@ dependencies:
   password_validated_field: ^0.0.3
   firebase_auth_web: ^3.0.0
   firebase_storage: ^10.0.2
+  flutter_mailer: ^2.0.0
 
 
 

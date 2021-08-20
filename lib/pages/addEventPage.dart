@@ -198,27 +198,34 @@ class AddEventState extends State<AddEventPage> {
                                     });
                                   },
                                   child: Container(
-                                    width: 100,
-                                    height: 70,
-                                    alignment: Alignment.center,
-                                    decoration:
-                                        BoxDecoration(color: Colors.white),
-                                    child: TextFormField(
-                                      style: TextStyle(fontSize: 20),
-                                      textAlign: TextAlign.center,
-                                      enabled: false,
-                                      keyboardType: TextInputType.text,
-                                      controller: _dateController,
-                                      decoration: InputDecoration(
-                                          disabledBorder: UnderlineInputBorder(
-                                              borderSide: BorderSide.none),
-                                          contentPadding:
-                                              EdgeInsets.only(top: 0)),
-                                      onChanged: (text) {
-                                        _myEvent.date = text;
-                                      },
-                                    ),
-                                  ),
+                                      width: 100,
+                                      height: 70,
+                                      alignment: Alignment.center,
+                                      decoration:
+                                          BoxDecoration(color: Colors.white),
+                                      child: _dateController.text == ""
+                                          ? Icon(
+                                              Icons.calendar_today,
+                                              color: Color(0xff643165),
+                                              size: 50,
+                                            )
+                                          : TextFormField(
+                                              style: TextStyle(fontSize: 20),
+                                              textAlign: TextAlign.center,
+                                              enabled: false,
+                                              keyboardType: TextInputType.text,
+                                              controller: _dateController,
+                                              decoration: InputDecoration(
+                                                  disabledBorder:
+                                                      UnderlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide.none),
+                                                  contentPadding:
+                                                      EdgeInsets.only(top: 0)),
+                                              onChanged: (text) {
+                                                _myEvent.date = text;
+                                              },
+                                            )),
                                 ),
                                 Padding(padding: EdgeInsets.only(left: 90)),
                                 InkWell(
@@ -232,21 +239,29 @@ class AddEventState extends State<AddEventPage> {
                                     height: 70,
                                     alignment: Alignment.center,
                                     decoration:
-                                        BoxDecoration(color: Colors.grey[200]),
-                                    child: TextFormField(
-                                      style: TextStyle(fontSize: 20),
-                                      textAlign: TextAlign.center,
-                                      enabled: false,
-                                      keyboardType: TextInputType.text,
-                                      controller: _timeController,
-                                      decoration: InputDecoration(
-                                        disabledBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide.none),
-                                      ),
-                                      onChanged: (text) {
-                                        _myEvent.time = text;
-                                      },
-                                    ),
+                                        BoxDecoration(color: Colors.white),
+                                    child: _timeController.text == ""
+                                        ? Icon(
+                                            Icons.timer,
+                                            color: Color(0xff643165),
+                                            size: 50,
+                                          )
+                                        : TextFormField(
+                                            style: TextStyle(fontSize: 20),
+                                            textAlign: TextAlign.center,
+                                            enabled: false,
+                                            keyboardType: TextInputType.text,
+                                            controller: _timeController,
+                                            decoration: InputDecoration(
+                                              disabledBorder:
+                                                  UnderlineInputBorder(
+                                                      borderSide:
+                                                          BorderSide.none),
+                                            ),
+                                            onChanged: (text) {
+                                              _myEvent.time = text;
+                                            },
+                                          ),
                                   ),
                                 ),
                               ],
@@ -328,10 +343,9 @@ class AddEventState extends State<AddEventPage> {
                                         borderSide:
                                             BorderSide(color: Colors.white),
                                       ),
-                                      labelText: '',
                                       labelStyle:
                                           TextStyle(color: Colors.white),
-                                      hintText: 'Description of the event'),
+                                      hintText: 'Description'),
                                   onChanged: (text) {
                                     _myEvent.description = text;
                                   },
@@ -359,7 +373,11 @@ class AddEventState extends State<AddEventPage> {
                                     child: _pickedImage != null
                                         ? Image.file(_pickedImage!,
                                             fit: BoxFit.fill)
-                                        : Text(''),
+                                        : Icon(
+                                            Icons.photo,
+                                            color: Color(0xff643165),
+                                            size: 100,
+                                          ),
                                     decoration: BoxDecoration(
                                       shape: BoxShape.rectangle,
                                       color: Colors.white,
@@ -437,12 +455,38 @@ class AddEventState extends State<AddEventPage> {
   }
 
   void _pickImageGallery() async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.getImage(source: ImageSource.gallery);
-    final pickedImageFile = File(pickedImage!.path);
-    setState(() {
-      _pickedImage = pickedImageFile;
-    });
+    try {
+      final picker = ImagePicker();
+      final pickedImage = await picker.getImage(source: ImageSource.gallery);
+      final pickedImageFile = File(pickedImage!.path);
+      setState(() {
+        _pickedImage = pickedImageFile;
+      });
+    } on TypeError catch (exception) {
+      Navigator.of(context).pop();
+    } catch (error) {
+      AlertDialog(
+        title: const Text('Something went wrong'),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: const <Widget>[
+              Text('Please make sure that your picture is a .jpg or .png file'),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text(
+              'OK',
+              style: TextStyle(color: Color(0xffa456a7)),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    }
   }
 
   Future<String> _sendImageToFirebase(BuildContext context) async {

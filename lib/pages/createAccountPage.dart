@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:a_voir_app/models/MyUser.dart';
 import 'package:a_voir_app/pages/loginPage.dart';
+import 'package:a_voir_app/pages/tutoPage.dart';
 import 'package:a_voir_app/ui/myTooltip.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -92,17 +93,19 @@ class CreateAccountState extends State<CreateAccountPage> {
                                   _pickImageGallery();
                                 },
                                 child: Container(
-                                  height: 150,
-                                  width: 200,
-                                  child: _pickedImage != null
-                                      ? Image.file(_pickedImage!,
-                                          fit: BoxFit.fill)
-                                      : Text(''),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white,
-                                  ),
-                                )),
+                                    height: 200,
+                                    width: 200,
+                                    decoration: _pickedImage != null
+                                        ? BoxDecoration(
+                                            image: DecorationImage(
+                                                image:
+                                                    FileImage(_pickedImage!)),
+                                          )
+                                        : BoxDecoration(
+                                            image: DecorationImage(
+                                                image: ExactAssetImage(
+                                                    "assets/images/camera.png")),
+                                          ))),
                             Padding(
                               //padding: const EdgeInsets.only(left:15.0,right: 15.0,top:0,bottom: 0),
                               padding: EdgeInsets.symmetric(
@@ -315,18 +318,70 @@ class CreateAccountState extends State<CreateAccountPage> {
                                       onPressed: () async {
                                         if (_formkey.currentState!.validate() &&
                                             _pickedImage != null) {
-                                          _myUser.url =
-                                              await _sendImageToFirebase(
-                                                  context);
-                                          setState(() {
-                                            _isCreationAccountCorrect = true;
-                                          });
-                                          _validPassword = true;
-                                          username = _usernameController.text;
-                                          email = _mailController.text
-                                              .toLowerCase();
-                                          password = _passwordController.text;
-                                          registration();
+                                          if (serviceProvider == false) {
+                                            AlertDialog alert = AlertDialog(
+                                              title: Text("Warning"),
+                                              content: Text(
+                                                "You are not Service Provider, which means you cannot create events. Do you wish to continue ?",
+                                                style: TextStyle(
+                                                    color: Color(0xffa456a7)),
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                    child: Text("Cancel",
+                                                        style: TextStyle(
+                                                            color: Colors.red)),
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      _buttonReset();
+                                                    }),
+                                                TextButton(
+                                                    child: Text("OK",
+                                                        style: TextStyle(
+                                                            color: Color(
+                                                                0xffa456a7))),
+                                                    onPressed: () async {
+                                                      _myUser.url =
+                                                          await _sendImageToFirebase(
+                                                              context);
+                                                      setState(() {
+                                                        _isCreationAccountCorrect =
+                                                            true;
+                                                      });
+                                                      _validPassword = true;
+                                                      username =
+                                                          _usernameController
+                                                              .text;
+                                                      email = _mailController
+                                                          .text
+                                                          .toLowerCase();
+                                                      password =
+                                                          _passwordController
+                                                              .text;
+                                                      registration();
+                                                    }),
+                                              ],
+                                            );
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return alert;
+                                              },
+                                            );
+                                          } else {
+                                            _myUser.url =
+                                                await _sendImageToFirebase(
+                                                    context);
+                                            setState(() {
+                                              _isCreationAccountCorrect = true;
+                                            });
+                                            _validPassword = true;
+                                            username = _usernameController.text;
+                                            email = _mailController.text
+                                                .toLowerCase();
+                                            password = _passwordController.text;
+                                            registration();
+                                          }
                                         } else {
                                           _validPassword = false;
 
@@ -370,12 +425,38 @@ class CreateAccountState extends State<CreateAccountPage> {
   }
 
   void _pickImageGallery() async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.getImage(source: ImageSource.gallery);
-    final pickedImageFile = File(pickedImage!.path);
-    setState(() {
-      _pickedImage = pickedImageFile;
-    });
+    try {
+      final picker = ImagePicker();
+      final pickedImage = await picker.getImage(source: ImageSource.gallery);
+      final pickedImageFile = File(pickedImage!.path);
+      setState(() {
+        _pickedImage = pickedImageFile;
+      });
+    } on TypeError catch (exception) {
+      Navigator.of(context).pop();
+    } catch (error) {
+      AlertDialog(
+        title: const Text('Something went wrong'),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: const <Widget>[
+              Text('Please make sure that your picture is a .jpg or .png file'),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text(
+              'OK',
+              style: TextStyle(color: Color(0xffa456a7)),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    }
   }
 
   Future<String> _sendImageToFirebase(BuildContext context) async {
@@ -450,7 +531,7 @@ class CreateAccountState extends State<CreateAccountPage> {
       Timer(Duration(seconds: 1), () {
         Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => LoginPage()),
+            MaterialPageRoute(builder: (context) => TutoPage()),
             ModalRoute.withName(Navigator.defaultRouteName));
       });
       context.loaderOverlay.hide();

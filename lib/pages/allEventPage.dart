@@ -113,6 +113,17 @@ class _AllEventState extends State<AllEventPage> {
                           child: Image.network(result.get("url")),
                         ),
                       ),
+                      Padding(
+                        padding: EdgeInsets.only(top: 10),
+                      ),
+                      Text(
+                        result.get("city"),
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                      ),
+                      Text(
+                        result.get("date"),
+                        style: TextStyle(fontSize: 20, color: Colors.white),
+                      ),
                     ])))));
       });
     });

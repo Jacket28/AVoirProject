@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/pages/createAccountPage.dart';
+import 'package:a_voir_app/pages/settingsPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'aboutPage.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -42,11 +45,27 @@ class LoginPageState extends State<LoginPage> {
             backgroundColor: Color(0xff643165),
             toolbarHeight: 70,
             elevation: 0,
+            title: IconButton(
+              icon: const Icon(Icons.info_outline),
+              iconSize: 40,
+              padding: EdgeInsets.only(left: 0),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AboutPage()),
+                );
+              },
+            ),
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.settings),
                 iconSize: 40,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SettingsPage()),
+                  );
+                },
               ),
             ],
           ),

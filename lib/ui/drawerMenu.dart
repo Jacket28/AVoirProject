@@ -1,5 +1,7 @@
+import 'package:a_voir_app/pages/aboutPage.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/pages/loginPage.dart';
+import 'package:a_voir_app/pages/settingsPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -126,7 +128,13 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
                 Container(
                   child: Column(children: <Widget>[
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => SettingsPage()),
+                        );
+                      },
                       child: ListTile(
                         leading: Image.asset(
                           "assets/images/settings.png",
@@ -167,7 +175,12 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
                   )),
                   Container(
                       child: TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AboutPage()),
+                      );
+                    },
                     child: Align(
                       alignment: FractionalOffset.bottomCenter,
                       child: ListTile(
@@ -186,6 +199,7 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
                   Container(
                       child: TextButton(
                     onPressed: () async {
+                      await FirebaseAuth.instance.signOut();
                       var test = await SharedPreferences.getInstance();
                       test.clear();
                       Navigator.pushAndRemoveUntil(

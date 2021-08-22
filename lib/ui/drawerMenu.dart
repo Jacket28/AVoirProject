@@ -1,5 +1,6 @@
 import 'package:a_voir_app/pages/aboutPage.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
+import 'package:a_voir_app/pages/filterEventPage.dart';
 import 'package:a_voir_app/pages/loginPage.dart';
 import 'package:a_voir_app/pages/settingsPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 //This class is used as a reusable component to display the appBar.
 class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
+  String uidConnectedUser = "";
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -60,7 +63,8 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => AllEventPage()),
+                              builder: (context) => FilterEventPage(
+                                  "", "", "", uidConnectedUser)),
                         );
                       },
                       child: ListTile(
@@ -229,7 +233,7 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
 
   Future<String> getUsername() async {
     User user = FirebaseAuth.instance.currentUser!;
-    var uidConnectedUser = user.uid;
+    uidConnectedUser = user.uid;
 
     String value = "";
 
@@ -246,7 +250,7 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
 
   Future<String> getAvatar() async {
     User user = FirebaseAuth.instance.currentUser!;
-    var uidConnectedUser = user.uid;
+    uidConnectedUser = user.uid;
 
     String value = "";
 

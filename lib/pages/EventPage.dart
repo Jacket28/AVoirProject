@@ -4,12 +4,12 @@ import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'allEventPage.dart';
+import 'filterEventPage.dart';
 
 //This page is used to display information about a specific event.
 class EventPage extends StatefulWidget {
@@ -162,11 +162,25 @@ class EventState extends State<EventPage> {
                         child: Container(
                           child: Row(
                             children: <Widget>[
-                              Text(
-                                user,
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 20),
-                              ),
+                              TextButton(
+                                onPressed: (() {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => FilterEventPage(
+                                          user,
+                                          "",
+                                          "",
+                                          "",
+                                        ),
+                                      ));
+                                }),
+                                child: new Text(
+                                  user,
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                ),
+                              )
                             ],
                           ),
                         ),
@@ -410,17 +424,13 @@ class EventState extends State<EventPage> {
   Future<bool> isAlreadyParticipating() async {
     bool alreadyParticipating = false;
 
-    var documentTest = await FirebaseFirestore.instance
+    var listAttendees = await FirebaseFirestore.instance
         .collection("events")
         .doc(myEvent.id)
         .get();
 
-    var test = List.from(documentTest['attendees'] as List)
+    alreadyParticipating = List.from(listAttendees['attendees'] as List)
         .contains(await getUsername());
-
-    if (test == true) {
-      alreadyParticipating = true;
-    }
 
     return alreadyParticipating;
   }
@@ -524,20 +534,20 @@ class EventState extends State<EventPage> {
         .doc(myEvent.id)
         .get()
         .then((doc) {
-      var test2 = List.from(doc["attendees"]);
-      for (int i = 0; i < test2.length; i++) {
-        listOfAttendees.add(test2[i]);
+      var isParticipating2 = List.from(doc["attendees"]);
+      for (int i = 0; i < isParticipating2.length; i++) {
+        listOfAttendees.add(isParticipating2[i]);
       }
     });
     return listOfAttendees;
   }
 
   Future<List<Widget>> getAttendants(BuildContext context) async {
-    List test = await getAttendeesFromDB();
-    myEvent.attendees = test;
+    List isParticipating = await getAttendeesFromDB();
+    myEvent.attendees = isParticipating;
     List<Widget> listofAttendants = [];
 
-    for (var i = 0; i < test.length; i++) {
+    for (var i = 0; i < isParticipating.length; i++) {
       listofAttendants.add(Row(children: <Widget>[
         Expanded(
           child: Container(
@@ -551,12 +561,27 @@ class EventState extends State<EventPage> {
                       child: Row(
                         children: <Widget>[
                           Row(children: <Widget>[
-                            Padding(padding: EdgeInsets.only(left: 40))
+                            Padding(
+                                padding: EdgeInsets.only(left: 40, bottom: 0))
                           ]),
-                          Text(
-                            test[i].toString(),
-                            style: TextStyle(color: Colors.white, fontSize: 18),
-                          )
+                          TextButton(
+                              onPressed: (() {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => FilterEventPage(
+                                        "",
+                                        "",
+                                        "",
+                                        isParticipating[i].toString(),
+                                      ),
+                                    ));
+                              }),
+                              child: new Text(
+                                isParticipating[i].toString(),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18),
+                              )),
                         ],
                       ),
                     ),

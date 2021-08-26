@@ -1,5 +1,5 @@
 import 'package:a_voir_app/pages/EventPage.dart';
-import 'package:a_voir_app/pages/filterEventPage.dart';
+import 'package:a_voir_app/pages/filterPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:a_voir_app/ui/bottomAppBar.dart';
@@ -68,19 +68,10 @@ class _AllEventState extends State<AllEventPage> {
                             ),
                           ),
                           onPressed: () {
-                            String creator = 'gaetano';
-                            String date = '8/19/2021';
-                            String city = 'Sion';
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => FilterEventPage(
-                                    creator,
-                                    date,
-                                    city,
-                                    "",
-                                  ),
-                                ));
+                                    builder: (context) => FilterPage()));
                           },
                         ),
                         _getEvents(context),

@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 //This class is used as a reusable component to display the appBar.
 class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
   String uidConnectedUser = "";
+  String username = "";
 
   @override
   Widget build(BuildContext context) {
@@ -63,8 +64,8 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => FilterEventPage(
-                                  "", "", "", uidConnectedUser)),
+                              builder: (context) =>
+                                  FilterEventPage("", "", "", username)),
                         );
                       },
                       child: ListTile(
@@ -235,17 +236,16 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
     User user = FirebaseAuth.instance.currentUser!;
     uidConnectedUser = user.uid;
 
-    String value = "";
-
     var collection = FirebaseFirestore.instance.collection('users');
     var docSnapshot = await collection.doc(uidConnectedUser).get();
     if (docSnapshot.exists) {
       Map<String, dynamic>? data = docSnapshot.data();
 
       // You can then retrieve the value from the Map like this:
-      value = data?['username'];
+
+      username = data?['username'];
     }
-    return value;
+    return username;
   }
 
   Future<String> getAvatar() async {

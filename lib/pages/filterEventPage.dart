@@ -1,39 +1,38 @@
 import 'package:a_voir_app/pages/EventPage.dart';
+import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
-import 'package:a_voir_app/ui/bottomAppBar.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 //This class is used to display all the events that are in the DB.
 class FilterEventPage extends StatefulWidget {
-  FilterEventPage(this.creator, this.date, this.city, this.user);
+  FilterEventPage(this.provider, this.date, this.city, this.user);
 
-  String creator = "";
-  String date = "";
-  String city = "";
-  String user = "";
+  final String provider;
+  final String date;
+  final String city;
+  final String user;
 
   @override
   _FilterEventState createState() =>
-      _FilterEventState(creator, date, city, user);
+      _FilterEventState(provider, date, city, user);
 }
 
 class _FilterEventState extends State<FilterEventPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  _FilterEventState(String creator, String date, String city, String user) {
-    this.creator = creator;
+  _FilterEventState(String provider, String date, String city, String user) {
+    this.provider = provider;
     this.date = date;
     this.city = city;
     this.user = user;
   }
 
-  String creator = "";
+  String provider = "";
   String date = "";
   String city = "";
   String user = "";
@@ -41,7 +40,7 @@ class _FilterEventState extends State<FilterEventPage> {
   @override
   Widget build(BuildContext context) {
     return new WillPopScope(
-        onWillPop: () async => false,
+        onWillPop: () async => true,
         child: Scaffold(
           key: _scaffoldKey,
           resizeToAvoidBottomInset: false,
@@ -59,6 +58,38 @@ class _FilterEventState extends State<FilterEventPage> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
+                        TextButton(
+                          child: Container(
+                            height: 50,
+                            width: 140,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              color: Colors.white,
+                              borderRadius: new BorderRadius.circular(25.0),
+                            ),
+                            child: Center(
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                  //Will be used later to take part the event
+                                  Container(
+                                      child: new Text(
+                                    "Supress filters",
+                                    style: TextStyle(
+                                        color: Color(0xffa456a7),
+                                        fontSize: 20.0),
+                                  ))
+                                ],
+                              ),
+                            ),
+                          ),
+                          onPressed: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AllEventPage()));
+                          },
+                        ),
                         _getEvents(context),
                       ],
                     ),
@@ -94,31 +125,23 @@ class _FilterEventState extends State<FilterEventPage> {
     Query query = events;
 
     if (city != "") {
-      print('filter by city $city');
       query = query.where('city', isEqualTo: city);
     }
 
     if (date != "") {
-      print('filter by date $date');
       query = query.where('date', isEqualTo: date);
     }
 
-    if (creator != "") {
-      print('filter by provider');
+    if (provider != "") {
       final users = await FirebaseFirestore.instance
           .collection("users")
-          .where('username', isEqualTo: creator)
+          .where('username', isEqualTo: provider)
           .get();
-      print(users.docs.first.id);
       query = query.where('provider', isEqualTo: users.docs.first.id);
     }
 
     if (user != "") {
-      print('filter by user $user');
-      final users =
-          await FirebaseFirestore.instance.collection("users").doc(user).get();
-      query =
-          query.where('attendees', arrayContains: users['username'] as String);
+      query = query.where('attendees', arrayContains: user);
     }
 
     //we store all the events into this List.
@@ -127,7 +150,6 @@ class _FilterEventState extends State<FilterEventPage> {
     //await is necessary to wait for the asynchronous call.
     await query.get().then((querySnapshot) {
       if (querySnapshot.size == 0) {
-        print('querySnapshot');
         //return Text('No event is corresponding to the filters');
         listofEvents.add(Container(
             child: new Text('No event is corresponding to the filters',
@@ -185,9 +207,5 @@ class _FilterEventState extends State<FilterEventPage> {
     });
     await Future.delayed(Duration(seconds: 1));
     return listofEvents;
-  }
-
-  Future<SharedPreferences> _setreferences(BuildContext context) async {
-    return await SharedPreferences.getInstance();
   }
 }

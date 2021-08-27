@@ -152,6 +152,7 @@ class _FilterEventState extends State<FilterEventPage> {
       if (querySnapshot.size == 0) {
         //return Text('No event is corresponding to the filters');
         listofEvents.add(Container(
+            padding: EdgeInsets.only(top: 20),
             child: new Text('No event is corresponding to the filters',
                 style: TextStyle(color: Colors.white, fontSize: 20.0))));
       }

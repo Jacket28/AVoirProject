@@ -158,29 +158,26 @@ class EventState extends State<EventPage> {
                   Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FilterEventPage(
+                                  user,
+                                  "",
+                                  "",
+                                  "",
+                                ),
+                              ));
+                        },
                         child: Container(
                           child: Row(
                             children: <Widget>[
-                              TextButton(
-                                onPressed: (() {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => FilterEventPage(
-                                          user,
-                                          "",
-                                          "",
-                                          "",
-                                        ),
-                                      ));
-                                }),
-                                child: new Text(
-                                  user,
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 20),
-                                ),
-                              )
+                              Text(
+                                user,
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 20),
+                              ),
                             ],
                           ),
                         ),
@@ -320,12 +317,12 @@ class EventState extends State<EventPage> {
               ),
               FutureBuilder(
                   future: getAttendants(context),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<Widget>> snapshot) {
+                  builder:
+                      (BuildContext context, AsyncSnapshot<Widget> snapshot) {
                     if (!snapshot.hasData) {
                       return CircularProgressIndicator();
                     }
-                    return new Column(children: snapshot.data!);
+                    return new Column(children: <Widget>[snapshot.data!]);
                   })
             ]);
           }
@@ -542,53 +539,53 @@ class EventState extends State<EventPage> {
     return listOfAttendees;
   }
 
-  Future<List<Widget>> getAttendants(BuildContext context) async {
+  Future<Widget> getAttendants(BuildContext context) async {
     List isParticipating = await getAttendeesFromDB();
     myEvent.attendees = isParticipating;
     List<Widget> listofAttendants = [];
 
     for (var i = 0; i < isParticipating.length; i++) {
       listofAttendants.add(Row(children: <Widget>[
-        Expanded(
-          child: Container(
-              padding: EdgeInsets.only(left: 110),
-              child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {},
-                    child: Container(
-                      padding: EdgeInsets.only(top: 10),
-                      child: Row(
-                        children: <Widget>[
-                          Row(children: <Widget>[
-                            Padding(
-                                padding: EdgeInsets.only(left: 40, bottom: 0))
-                          ]),
-                          TextButton(
-                              onPressed: (() {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => FilterEventPage(
-                                        "",
-                                        "",
-                                        "",
-                                        isParticipating[i].toString(),
-                                      ),
-                                    ));
-                              }),
-                              child: new Text(
-                                isParticipating[i].toString(),
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 18),
-                              )),
-                        ],
-                      ),
-                    ),
-                  ))),
-        ),
+        Container(
+            padding: EdgeInsets.only(left: 110),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FilterEventPage(
+                          "",
+                          "",
+                          "",
+                          isParticipating[i].toString(),
+                        ),
+                      ));
+                },
+                child: Container(
+                  padding: EdgeInsets.only(top: 10),
+                  child: Row(children: <Widget>[
+                    Padding(padding: EdgeInsets.only(left: 40, bottom: 0)),
+                    Text(
+                      isParticipating[i].toString(),
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    )
+                  ]),
+                ),
+              ),
+            )),
       ]));
     }
-    return listofAttendants;
+
+    return new Container(
+      child: Expanded(
+        child: SingleChildScrollView(
+          child: Column(children: listofAttendants),
+        ),
+      ),
+      width: 500,
+      height: 150,
+    );
   }
 }

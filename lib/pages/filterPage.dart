@@ -34,16 +34,6 @@ class FilterState extends State<FilterPage> {
   //controllers are used to manage changes with the texfield.
   TextEditingController _dateController = TextEditingController();
 
-  // final _titleController = TextEditingController();
-  final _locationController = TextEditingController();
-  final _descriptionController = TextEditingController();
-
-  //InitSate is used to set the textFields to empty at the initialization of the page.
-  @override
-  void initState() {
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     dateTime = DateFormat.yMd().format(DateTime.now());
@@ -131,11 +121,24 @@ class FilterState extends State<FilterPage> {
                               if (snapshot.connectionState ==
                                   ConnectionState.done) {
                                 if (snapshot.hasData) {
-                                  return new DropdownButton(
+                                  return new DropdownButtonFormField(
+                                    decoration: InputDecoration(
+                                        border: OutlineInputBorder(
+                                          borderRadius: const BorderRadius.all(
+                                            const Radius.circular(30.0),
+                                          ),
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.white),
+                                    icon: Icon(Icons.keyboard_arrow_down),
                                     value: city,
                                     items: snapshot.data!.map((city) {
                                       return new DropdownMenuItem(
-                                          value: city, child: Text(city));
+                                          value: city,
+                                          child: Text(
+                                            city,
+                                            textAlign: TextAlign.center,
+                                          ));
                                     }).toList(),
                                     onChanged: (value) {
                                       setState(() {
@@ -169,12 +172,26 @@ class FilterState extends State<FilterPage> {
                               if (snapshot.connectionState ==
                                   ConnectionState.done) {
                                 if (snapshot.hasData) {
-                                  return new DropdownButton(
+                                  return new DropdownButtonFormField(
+                                    decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderRadius: const BorderRadius.all(
+                                          const Radius.circular(30.0),
+                                        ),
+                                      ),
+                                      filled: true,
+                                      fillColor: Colors.white,
+                                    ),
+                                    icon: Icon(Icons.keyboard_arrow_down),
                                     value: provider,
                                     items: snapshot.data!.map((provider) {
                                       return new DropdownMenuItem(
-                                          value: provider,
-                                          child: Text(provider));
+                                        value: provider,
+                                        child: Text(
+                                          "$provider",
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      );
                                     }).toList(),
                                     onChanged: (value) {
                                       setState(() {
@@ -258,8 +275,6 @@ class FilterState extends State<FilterPage> {
       });
     });
 
-    print(cities.toSet().toList());
-
     return cities.toSet().toList();
   }
 
@@ -272,14 +287,10 @@ class FilterState extends State<FilterPage> {
     providers.add('');
 
     await events.get().then((querySnapshot) {
-      print('querysnapshot');
       querySnapshot.docs.forEach((result) {
-        print('result');
         providers.add(result['username']);
       });
     });
-
-    print(providers.toSet().toList());
 
     return providers.toSet().toList();
   }

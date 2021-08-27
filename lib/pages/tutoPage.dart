@@ -1,7 +1,5 @@
 import 'package:a_voir_app/pages/loginPage.dart';
-import 'package:a_voir_app/ui/appBar.dart';
 import 'package:dots_indicator/dots_indicator.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class TutoPage extends StatefulWidget {

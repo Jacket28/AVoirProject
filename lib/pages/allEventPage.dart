@@ -176,7 +176,9 @@ class _AllEventState extends State<AllEventPage> {
             if (snapshot.hasData) {
               this.user = snapshot.data!.getString('userId')!;
               if (snapshot.data!.getBool('isProvider')!) {
-                return _addButtonVisible(context);
+                return _addButtonVisible(
+                  context,
+                );
               }
             }
           }
@@ -192,6 +194,8 @@ class _AllEventState extends State<AllEventPage> {
   }
 
   Widget _addButtonVisible(BuildContext context) {
-    return Container(height: 100, width: 600, child: BottomNavBarV2());
+    final Size size = MediaQuery.of(context).size;
+
+    return Container(height: 100, width: size.width, child: BottomNavBarV2());
   }
 }

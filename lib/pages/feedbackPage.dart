@@ -1,13 +1,11 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:a_voir_app/pages/settingsPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_email_sender/flutter_email_sender.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:flutter_mailer/flutter_mailer.dart';

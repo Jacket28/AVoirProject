@@ -1,5 +1,6 @@
 import 'package:a_voir_app/pages/aboutPage.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
+import 'package:a_voir_app/pages/filterEventPage.dart';
 import 'package:a_voir_app/pages/loginPage.dart';
 import 'package:a_voir_app/pages/settingsPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,6 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 //This class is used as a reusable component to display the appBar.
 class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
+  String uidConnectedUser = "";
+  String username = "";
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -60,7 +64,8 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => AllEventPage()),
+                              builder: (context) =>
+                                  FilterEventPage("", "", "", username)),
                         );
                       },
                       child: ListTile(
@@ -229,9 +234,7 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
 
   Future<String> getUsername() async {
     User user = FirebaseAuth.instance.currentUser!;
-    var uidConnectedUser = user.uid;
-
-    String value = "";
+    uidConnectedUser = user.uid;
 
     var collection = FirebaseFirestore.instance.collection('users');
     var docSnapshot = await collection.doc(uidConnectedUser).get();
@@ -239,14 +242,15 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
       Map<String, dynamic>? data = docSnapshot.data();
 
       // You can then retrieve the value from the Map like this:
-      value = data?['username'];
+
+      username = data?['username'];
     }
-    return value;
+    return username;
   }
 
   Future<String> getAvatar() async {
     User user = FirebaseAuth.instance.currentUser!;
-    var uidConnectedUser = user.uid;
+    uidConnectedUser = user.uid;
 
     String value = "";
 

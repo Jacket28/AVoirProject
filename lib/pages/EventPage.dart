@@ -4,12 +4,12 @@ import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'allEventPage.dart';
+import 'filterEventPage.dart';
 
 //This page is used to display information about a specific event.
 class EventPage extends StatefulWidget {
@@ -158,7 +158,18 @@ class EventState extends State<EventPage> {
                   Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FilterEventPage(
+                                  user,
+                                  "",
+                                  "",
+                                  "",
+                                ),
+                              ));
+                        },
                         child: Container(
                           child: Row(
                             children: <Widget>[
@@ -306,12 +317,12 @@ class EventState extends State<EventPage> {
               ),
               FutureBuilder(
                   future: getAttendants(context),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<Widget>> snapshot) {
+                  builder:
+                      (BuildContext context, AsyncSnapshot<Widget> snapshot) {
                     if (!snapshot.hasData) {
                       return CircularProgressIndicator();
                     }
-                    return new Column(children: snapshot.data!);
+                    return new Column(children: <Widget>[snapshot.data!]);
                   })
             ]);
           }
@@ -410,17 +421,13 @@ class EventState extends State<EventPage> {
   Future<bool> isAlreadyParticipating() async {
     bool alreadyParticipating = false;
 
-    var documentTest = await FirebaseFirestore.instance
+    var listAttendees = await FirebaseFirestore.instance
         .collection("events")
         .doc(myEvent.id)
         .get();
 
-    var test = List.from(documentTest['attendees'] as List)
+    alreadyParticipating = List.from(listAttendees['attendees'] as List)
         .contains(await getUsername());
-
-    if (test == true) {
-      alreadyParticipating = true;
-    }
 
     return alreadyParticipating;
   }
@@ -524,46 +531,61 @@ class EventState extends State<EventPage> {
         .doc(myEvent.id)
         .get()
         .then((doc) {
-      var test2 = List.from(doc["attendees"]);
-      for (int i = 0; i < test2.length; i++) {
-        listOfAttendees.add(test2[i]);
+      var isParticipating2 = List.from(doc["attendees"]);
+      for (int i = 0; i < isParticipating2.length; i++) {
+        listOfAttendees.add(isParticipating2[i]);
       }
     });
     return listOfAttendees;
   }
 
-  Future<List<Widget>> getAttendants(BuildContext context) async {
-    List test = await getAttendeesFromDB();
-    myEvent.attendees = test;
+  Future<Widget> getAttendants(BuildContext context) async {
+    List isParticipating = await getAttendeesFromDB();
+    myEvent.attendees = isParticipating;
     List<Widget> listofAttendants = [];
 
-    for (var i = 0; i < test.length; i++) {
+    for (var i = 0; i < isParticipating.length; i++) {
       listofAttendants.add(Row(children: <Widget>[
-        Expanded(
-          child: Container(
-              padding: EdgeInsets.only(left: 110),
-              child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {},
-                    child: Container(
-                      padding: EdgeInsets.only(top: 10),
-                      child: Row(
-                        children: <Widget>[
-                          Row(children: <Widget>[
-                            Padding(padding: EdgeInsets.only(left: 40))
-                          ]),
-                          Text(
-                            test[i].toString(),
-                            style: TextStyle(color: Colors.white, fontSize: 18),
-                          )
-                        ],
-                      ),
-                    ),
-                  ))),
-        ),
+        Container(
+            padding: EdgeInsets.only(left: 110),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FilterEventPage(
+                          "",
+                          "",
+                          "",
+                          isParticipating[i].toString(),
+                        ),
+                      ));
+                },
+                child: Container(
+                  padding: EdgeInsets.only(top: 10),
+                  child: Row(children: <Widget>[
+                    Padding(padding: EdgeInsets.only(left: 40, bottom: 0)),
+                    Text(
+                      isParticipating[i].toString(),
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    )
+                  ]),
+                ),
+              ),
+            )),
       ]));
     }
-    return listofAttendants;
+
+    return new Container(
+      child: Expanded(
+        child: SingleChildScrollView(
+          child: Column(children: listofAttendants),
+        ),
+      ),
+      width: 500,
+      height: 150,
+    );
   }
 }

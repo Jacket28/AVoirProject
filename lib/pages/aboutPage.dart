@@ -1,14 +1,9 @@
-import 'package:a_voir_app/pages/EventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
-import 'package:a_voir_app/ui/bottomAppBar.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 //This class is used to display all the events that are in the DB.
 class AboutPage extends StatefulWidget {

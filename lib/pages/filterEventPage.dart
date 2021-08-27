@@ -1,30 +1,46 @@
 import 'package:a_voir_app/pages/EventPage.dart';
-import 'package:a_voir_app/pages/filterPage.dart';
+import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
-import 'package:a_voir_app/ui/bottomAppBar.dart';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 //This class is used to display all the events that are in the DB.
-class AllEventPage extends StatefulWidget {
+class FilterEventPage extends StatefulWidget {
+  FilterEventPage(this.provider, this.date, this.city, this.user);
+
+  final String provider;
+  final String date;
+  final String city;
+  final String user;
+
   @override
-  _AllEventState createState() => _AllEventState();
+  _FilterEventState createState() =>
+      _FilterEventState(provider, date, city, user);
 }
 
-class _AllEventState extends State<AllEventPage> {
+class _FilterEventState extends State<FilterEventPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
+  _FilterEventState(String provider, String date, String city, String user) {
+    this.provider = provider;
+    this.date = date;
+    this.city = city;
+    this.user = user;
+  }
+
+  String provider = "";
+  String date = "";
+  String city = "";
   String user = "";
 
   @override
   Widget build(BuildContext context) {
     return new WillPopScope(
-        onWillPop: () async => false,
+        onWillPop: () async => true,
         child: Scaffold(
           key: _scaffoldKey,
           resizeToAvoidBottomInset: false,
@@ -58,7 +74,7 @@ class _AllEventState extends State<AllEventPage> {
                                   //Will be used later to take part the event
                                   Container(
                                       child: new Text(
-                                    "Filter",
+                                    "Supress filters",
                                     style: TextStyle(
                                         color: Color(0xffa456a7),
                                         fontSize: 20.0),
@@ -71,7 +87,7 @@ class _AllEventState extends State<AllEventPage> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => FilterPage()));
+                                    builder: (context) => AllEventPage()));
                           },
                         ),
                         _getEvents(context),
@@ -79,7 +95,6 @@ class _AllEventState extends State<AllEventPage> {
                     ),
                   ),
                 ),
-                _addButton(context),
               ],
             );
           }),
@@ -104,14 +119,43 @@ class _AllEventState extends State<AllEventPage> {
 
 //This method is used to build the interface of the page based uppon the gotten events from the DB.
   Future<List<Widget>> _getEvent(BuildContext context) async {
-    final CollectionReference events =
+    CollectionReference events =
         FirebaseFirestore.instance.collection("events");
+
+    Query query = events;
+
+    if (city != "") {
+      query = query.where('city', isEqualTo: city);
+    }
+
+    if (date != "") {
+      query = query.where('date', isEqualTo: date);
+    }
+
+    if (provider != "") {
+      final users = await FirebaseFirestore.instance
+          .collection("users")
+          .where('username', isEqualTo: provider)
+          .get();
+      query = query.where('provider', isEqualTo: users.docs.first.id);
+    }
+
+    if (user != "") {
+      query = query.where('attendees', arrayContains: user);
+    }
 
     //we store all the events into this List.
     List<Widget> listofEvents = [];
 
     //await is necessary to wait for the asynchronous call.
-    await events.get().then((querySnapshot) {
+    await query.get().then((querySnapshot) {
+      if (querySnapshot.size == 0) {
+        //return Text('No event is corresponding to the filters');
+        listofEvents.add(Container(
+            padding: EdgeInsets.only(top: 20),
+            child: new Text('No event is corresponding to the filters',
+                style: TextStyle(color: Colors.white, fontSize: 20.0))));
+      }
       querySnapshot.docs.forEach((result) {
         listofEvents.add(Center(
             child: TextButton(
@@ -164,34 +208,5 @@ class _AllEventState extends State<AllEventPage> {
     });
     await Future.delayed(Duration(seconds: 1));
     return listofEvents;
-  }
-
-  Widget _addButton(BuildContext context) {
-    return Center(
-      child: FutureBuilder(
-        future: _setreferences(context),
-        builder:
-            (BuildContext context, AsyncSnapshot<SharedPreferences> snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.hasData) {
-              this.user = snapshot.data!.getString('userId')!;
-              if (snapshot.data!.getBool('isProvider')!) {
-                return _addButtonVisible(context);
-              }
-            }
-          }
-
-          return Container(color: Colors.transparent);
-        },
-      ),
-    );
-  }
-
-  Future<SharedPreferences> _setreferences(BuildContext context) async {
-    return await SharedPreferences.getInstance();
-  }
-
-  Widget _addButtonVisible(BuildContext context) {
-    return Container(height: 100, width: 600, child: BottomNavBarV2());
   }
 }

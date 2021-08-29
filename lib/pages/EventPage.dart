@@ -7,6 +7,7 @@ import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'allEventPage.dart';
 import 'filterEventPage.dart';
@@ -52,6 +53,15 @@ class EventState extends State<EventPage> {
       setState(() {});
     });
     super.initState();
+  }
+
+  void share(BuildContext context, MyEvent myevents) {
+    final String text =
+        "Look I'm attending the event : ${myevents.title} on ${myevents.date} with ${myevents.attendees}";
+    RenderBox box = context.findRenderObject() as RenderBox;
+    Share.share(text,
+        subject: "Event : ${myevents.title}",
+        sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
   }
 
   @override
@@ -128,7 +138,7 @@ class EventState extends State<EventPage> {
                 children: <Widget>[
                   IconButton(
                     padding: EdgeInsets.only(left: 30, right: 110),
-                    onPressed: () {},
+                    onPressed: () => share(context, myEvent),
                     icon: Image.asset(
                       "assets/images/share.png",
                       height: 100,

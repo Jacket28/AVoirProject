@@ -3,6 +3,7 @@ import 'package:a_voir_app/pages/loginPage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 //This page is the initialization page which call the first page of the app (allEventPage).
 void main() async {
@@ -29,6 +30,15 @@ class MyApp extends StatelessWidget {
             page = LoginPage();
           }
           return MaterialApp(
+              localizationsDelegates: [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: [
+                Locale('en', 'US'), // English
+                Locale('fr', 'FR'), // French
+              ],
               debugShowCheckedModeBanner: false,
               home: Scaffold(
                 key: _scaffoldKey,

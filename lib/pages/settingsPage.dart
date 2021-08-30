@@ -1,3 +1,4 @@
+import 'package:a_voir_app/models/language.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,6 +15,10 @@ class SettingsPage extends StatefulWidget {
 class SettingsState extends State<SettingsPage> {
   String dropdownvalue = 'English';
   var items = ['English', 'French'];
+
+  void _changeLanguage(Language language) {
+    print((language.languageCode));
+  }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -62,14 +67,14 @@ class SettingsState extends State<SettingsPage> {
                   Icons.keyboard_arrow_down,
                   color: Colors.black,
                 ),
-                items: items.map((String items) {
-                  return DropdownMenuItem(value: items, child: Text(items));
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    dropdownvalue = newValue!;
-                  });
-                },
+                items: Language.languageList()
+                    .map<DropdownMenuItem<Language>>((lang) => DropdownMenuItem(
+                          value: lang,
+                          child: Row(
+                            children: <Widget>[Text(lang.name)],
+                          ),
+                        ))
+                    .toList(),
               ),
             ),
             Padding(

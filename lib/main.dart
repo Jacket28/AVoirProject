@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/pages/loginPage.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -13,7 +15,13 @@ void main() async {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => new _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  //late Locale _locale;
   //scaffoldKey will be used later for the burger menu
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -31,6 +39,7 @@ class MyApp extends StatelessWidget {
             page = LoginPage();
           }
           return MaterialApp(
+              //locale: _locale,
               localizationsDelegates: [
                 const TranslationsDelegate(),
                 GlobalMaterialLocalizations.delegate,
@@ -41,6 +50,15 @@ class MyApp extends StatelessWidget {
                 Locale('en', 'US'), // English
                 Locale('fr', 'FR'), // French
               ],
+              localeResolutionCallback: (deviceLocale, supportedLocales) {
+                for (var locale in supportedLocales) {
+                  if (locale.languageCode == deviceLocale!.languageCode &&
+                      locale.countryCode == deviceLocale.countryCode) {
+                    return deviceLocale;
+                  }
+                }
+                return supportedLocales.first;
+              },
               debugShowCheckedModeBanner: false,
               home: Scaffold(
                 key: _scaffoldKey,

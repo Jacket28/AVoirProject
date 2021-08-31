@@ -1,5 +1,6 @@
 import 'package:a_voir_app/main.dart';
 import 'package:a_voir_app/models/language.dart';
+import 'package:a_voir_app/translations.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,6 +18,7 @@ class SettingsState extends State<SettingsPage> {
   //String dropdownvalue = 'English';
   //var items = ['English', 'French'];
 
+//should change the language when we click on the OnChanged
   void _changeLanguage(Language? language) {
     Locale _temp;
     switch (language?.languageCode) {
@@ -51,7 +53,8 @@ class SettingsState extends State<SettingsPage> {
             ),
             Container(
                 child: Center(
-              child: Text(
+              child: //Text(Translations.of(context).translate('language')),
+                  Text(
                 'Language : ',
                 textAlign: TextAlign.center,
                 style: TextStyle(

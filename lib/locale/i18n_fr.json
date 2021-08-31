@@ -11,5 +11,6 @@
     "url": "url",
     "dateTime": "date",
     "selectedDate": "date choisie",
-    "user": "utilisateur"
+    "user": "utilisateur",
+    "language": "lang"
 }

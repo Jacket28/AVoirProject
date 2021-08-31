@@ -26,16 +26,15 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  late Locale _locale;
-  //scaffoldKey will be used later for the burger menu
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
+  Locale? _locale;
   void setLocale(Locale locale) {
     setState(() {
       _locale = locale;
     });
   }
 
+  //scaffoldKey will be used later for the burger menu
+  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     //FutureBuilder is created for using asynchronous calls since we have a fireBase databse.
@@ -50,17 +49,20 @@ class _MyAppState extends State<MyApp> {
             page = LoginPage();
           }
           return MaterialApp(
-              //locale: _locale,
               localizationsDelegates: [
                 Translations.delegate,
                 GlobalMaterialLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,
               ],
+              //supported languages
+              locale: _locale,
               supportedLocales: [
                 Locale('en', 'US'), // English
                 Locale('fr', 'FR'), // French
               ],
+
+              //to check if the local codes are the same to the device codes
               localeResolutionCallback: (deviceLocale, supportedLocales) {
                 for (var locale in supportedLocales) {
                   if (locale.languageCode == deviceLocale!.languageCode &&

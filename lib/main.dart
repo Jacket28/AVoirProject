@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
           return MaterialApp(
               //locale: _locale,
               localizationsDelegates: [
-                const TranslationsDelegate(),
+                Translations.delegate,
                 GlobalMaterialLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,
                 GlobalCupertinoLocalizations.delegate,

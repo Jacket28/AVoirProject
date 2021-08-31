@@ -17,17 +17,17 @@ class SettingsState extends State<SettingsPage> {
   //String dropdownvalue = 'English';
   //var items = ['English', 'French'];
 
-  void _changeLanguage(Language language) {
+  void _changeLanguage(Language? language) {
     Locale _temp;
-    switch (language.languageCode) {
+    switch (language?.languageCode) {
       case 'en':
-        _temp = Locale(language.languageCode, 'US');
+        _temp = Locale(language!.languageCode, 'US');
         break;
       case 'fr':
-        _temp = Locale(language.languageCode, 'FR');
+        _temp = Locale(language!.languageCode, 'FR');
         break;
       default:
-        _temp = Locale(language.languageCode, 'US');
+        _temp = Locale(language!.languageCode, 'US');
     }
     MyApp.setLocale(context, _temp);
   }
@@ -70,11 +70,8 @@ class SettingsState extends State<SettingsPage> {
                 borderRadius: BorderRadius.circular(25),
                 color: Colors.white,
               ),
-              width: 125,
+              width: 132,
               child: DropdownButton(
-                /*onChanged: (Language language) {
-                  _changeLanguage(language);
-                },*/
                 //value: dropdownvalue,
                 underline: SizedBox(),
                 dropdownColor: Colors.white,
@@ -83,21 +80,31 @@ class SettingsState extends State<SettingsPage> {
                   Icons.keyboard_arrow_down,
                   color: Colors.black,
                 ),
+
+                onChanged: (Language? language) {
+                  _changeLanguage(language);
+                },
+
+                items: Language.languageList()
+                    .map<DropdownMenuItem<Language>>(
+                      (lang) => DropdownMenuItem<Language>(
+                        value: lang,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: <Widget>[Text(lang.name)],
+                        ),
+                      ),
+                    )
+                    .toList(),
+                //old code
                 /*items: items.map((String items) {
                     return DropdownMenuItem(value: items, child: Text(items));
                   }).toList(),
                   onChanged: (String? newValue) {
                     setState(() {
                       dropdownvalue = newValue!;
-                    });*/
-                items: Language.languageList()
-                    .map<DropdownMenuItem<Language>>((lang) => DropdownMenuItem(
-                          value: lang,
-                          child: Row(
-                            children: <Widget>[Text(lang.name)],
-                          ),
-                        ))
-                    .toList(),
+                    });
+                  }*/
               ),
             ),
             Padding(

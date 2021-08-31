@@ -1,3 +1,4 @@
+import 'package:a_voir_app/main.dart';
 import 'package:a_voir_app/models/language.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
@@ -13,11 +14,22 @@ class SettingsPage extends StatefulWidget {
 }
 
 class SettingsState extends State<SettingsPage> {
-  String dropdownvalue = 'English';
-  var items = ['English', 'French'];
+  //String dropdownvalue = 'English';
+  //var items = ['English', 'French'];
 
   void _changeLanguage(Language language) {
-    print((language.languageCode));
+    Locale _temp;
+    switch (language.languageCode) {
+      case 'en':
+        _temp = Locale(language.languageCode, 'US');
+        break;
+      case 'fr':
+        _temp = Locale(language.languageCode, 'FR');
+        break;
+      default:
+        _temp = Locale(language.languageCode, 'US');
+    }
+    MyApp.setLocale(context, _temp);
   }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -58,15 +70,26 @@ class SettingsState extends State<SettingsPage> {
                 borderRadius: BorderRadius.circular(25),
                 color: Colors.white,
               ),
-              width: 117,
+              width: 125,
               child: DropdownButton(
-                value: dropdownvalue,
+                /*onChanged: (Language language) {
+                  _changeLanguage(language);
+                },*/
+                //value: dropdownvalue,
+                underline: SizedBox(),
                 dropdownColor: Colors.white,
                 focusColor: Colors.white,
                 icon: Icon(
                   Icons.keyboard_arrow_down,
                   color: Colors.black,
                 ),
+                /*items: items.map((String items) {
+                    return DropdownMenuItem(value: items, child: Text(items));
+                  }).toList(),
+                  onChanged: (String? newValue) {
+                    setState(() {
+                      dropdownvalue = newValue!;
+                    });*/
                 items: Language.languageList()
                     .map<DropdownMenuItem<Language>>((lang) => DropdownMenuItem(
                           value: lang,

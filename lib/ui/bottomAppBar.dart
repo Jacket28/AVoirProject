@@ -57,7 +57,7 @@ class _BottomNavBarV2State extends State<BottomNavBarV2> {
                                       time: "",
                                       provider: "",
                                       attendees: [],
-                                      url: '',
+                                      url: "",
                                     ))),
                           );
                         }),

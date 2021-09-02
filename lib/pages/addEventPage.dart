@@ -9,6 +9,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -50,7 +51,7 @@ class AddEventState extends State<AddEventPage> {
   //Used to know if the textField can be edited or not.
   bool isEditing = false;
 
-  File? _pickedImage;
+  String _pickedImage = "";
 
   String url = "";
 
@@ -85,6 +86,7 @@ class AddEventState extends State<AddEventPage> {
       _descriptionController.text = _myEvent.description;
       _dateController.text = _myEvent.date;
       _timeController.text = _myEvent.time;
+      _pickedImage = _myEvent.url;
     }
 
     _setreferences(context).whenComplete(() {
@@ -370,8 +372,8 @@ class AddEventState extends State<AddEventPage> {
                                   child: Container(
                                     height: 150,
                                     width: 200,
-                                    child: _pickedImage != null
-                                        ? Image.file(_pickedImage!,
+                                    child: _pickedImage != ""
+                                        ? Image.network(_pickedImage,
                                             fit: BoxFit.fill)
                                         : Icon(
                                             Icons.photo,
@@ -421,7 +423,7 @@ class AddEventState extends State<AddEventPage> {
                                       _myEvent.npa == "" ||
                                       _myEvent.city == "" "" ||
                                       _myEvent.description == "" ||
-                                      _pickedImage == null) {
+                                      _pickedImage == "") {
                                     //Error message to create
                                     _alertDialogFill();
                                   } else {
@@ -458,7 +460,7 @@ class AddEventState extends State<AddEventPage> {
     try {
       final picker = ImagePicker();
       final pickedImage = await picker.getImage(source: ImageSource.gallery);
-      final pickedImageFile = File(pickedImage!.path);
+      final pickedImageFile = pickedImage!.path;
       setState(() {
         _pickedImage = pickedImageFile;
       });
@@ -494,7 +496,7 @@ class AddEventState extends State<AddEventPage> {
         .ref()
         .child("eventImages")
         .child(_myEvent.title + ".jpg");
-    await ref.putFile(_pickedImage!);
+    await ref.putFile(File(_pickedImage));
     url = await ref.getDownloadURL();
 
     return url;

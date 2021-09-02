@@ -1,5 +1,4 @@
 import 'package:a_voir_app/pages/EventPage.dart';
-import 'package:a_voir_app/pages/filterPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:a_voir_app/ui/bottomAppBar.dart';
@@ -8,6 +7,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 //This class is used to display all the events that are in the DB.
@@ -42,38 +42,6 @@ class _AllEventState extends State<AllEventPage> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        TextButton(
-                          child: Container(
-                            height: 50,
-                            width: 140,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.rectangle,
-                              color: Colors.white,
-                              borderRadius: new BorderRadius.circular(25.0),
-                            ),
-                            child: Center(
-                              child: Row(
-                                mainAxisSize: MainAxisSize.min,
-                                children: <Widget>[
-                                  //Will be used later to take part the event
-                                  Container(
-                                      child: new Text(
-                                    "Filter",
-                                    style: TextStyle(
-                                        color: Color(0xffa456a7),
-                                        fontSize: 20.0),
-                                  ))
-                                ],
-                              ),
-                            ),
-                          ),
-                          onPressed: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => FilterPage()));
-                          },
-                        ),
                         _getEvents(context),
                       ],
                     ),
@@ -104,14 +72,21 @@ class _AllEventState extends State<AllEventPage> {
 
 //This method is used to build the interface of the page based uppon the gotten events from the DB.
   Future<List<Widget>> _getEvent(BuildContext context) async {
-    final CollectionReference events =
-        FirebaseFirestore.instance.collection("events");
-
+    final events = FirebaseFirestore.instance.collection("events").where('date',
+        isGreaterThanOrEqualTo:
+            DateFormat.yMd().format(DateTime.now()).toString());
     //we store all the events into this List.
     List<Widget> listofEvents = [];
 
     //await is necessary to wait for the asynchronous call.
     await events.get().then((querySnapshot) {
+      if (querySnapshot.size == 0) {
+        //return Text('No event is corresponding to the filters');
+        listofEvents.add(Container(
+            padding: EdgeInsets.only(top: 20),
+            child: new Text('No event is available',
+                style: TextStyle(color: Colors.white, fontSize: 20.0))));
+      }
       querySnapshot.docs.forEach((result) {
         listofEvents.add(Center(
             child: TextButton(
@@ -143,9 +118,9 @@ class _AllEventState extends State<AllEventPage> {
                         padding: EdgeInsets.only(top: 10),
                         width: 300,
                         height: 200,
-                        child: Transform.scale(
-                          scale: 1,
-                          child: Image.network(result.get("url")),
+                        child: Image.network(
+                          result.get("url"),
+                          fit: BoxFit.cover,
                         ),
                       ),
                       Padding(
@@ -160,6 +135,7 @@ class _AllEventState extends State<AllEventPage> {
                         style: TextStyle(fontSize: 20, color: Colors.white),
                       ),
                     ])))));
+        //}
       });
     });
     await Future.delayed(Duration(seconds: 1));

@@ -108,7 +108,6 @@ class EventState extends State<EventPage> {
                                 Padding(
                                   padding: EdgeInsets.only(top: 30),
                                 ),
-                                _addParticipateButton(context)
                               ],
                             ),
                           ),
@@ -133,6 +132,7 @@ class EventState extends State<EventPage> {
         //this condition is used to handle errors
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
+            print('has data');
             return new Column(children: <Widget>[
               Row(
                 children: <Widget>[
@@ -333,7 +333,8 @@ class EventState extends State<EventPage> {
                       return CircularProgressIndicator();
                     }
                     return new Column(children: <Widget>[snapshot.data!]);
-                  })
+                  }),
+              _addParticipateButton(context)
             ]);
           }
 
@@ -354,9 +355,9 @@ class EventState extends State<EventPage> {
         .get();
 
     final Map<String, Object?>? document = event.data();
-
     myEvent = MyEvent.fromJson(document!);
     myEvent.id = eventId;
+    print(myEvent.provider);
 
     final DocumentSnapshot<Map<String, Object?>> user = await FirebaseFirestore
         .instance
@@ -365,7 +366,6 @@ class EventState extends State<EventPage> {
         .get();
 
     this.user = user.data()!['username'] as String;
-
     return myEvent;
   }
 

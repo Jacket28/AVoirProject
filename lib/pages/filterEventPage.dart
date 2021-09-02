@@ -119,17 +119,17 @@ class _FilterEventState extends State<FilterEventPage> {
 
 //This method is used to build the interface of the page based uppon the gotten events from the DB.
   Future<List<Widget>> _getEvent(BuildContext context) async {
-    CollectionReference events =
-        FirebaseFirestore.instance.collection("events");
+    Query events = FirebaseFirestore.instance.collection("events");
 
-    Query query = events;
+    //we store all the events into this List.
+    List<Widget> listofEvents = [];
 
     if (city != "") {
-      query = query.where('city', isEqualTo: city);
+      events = events.where('city', isEqualTo: city);
     }
 
     if (date != "") {
-      query = query.where('date', isEqualTo: date);
+      events = events.where('date', isEqualTo: date);
     }
 
     if (provider != "") {
@@ -137,18 +137,24 @@ class _FilterEventState extends State<FilterEventPage> {
           .collection("users")
           .where('username', isEqualTo: provider)
           .get();
-      query = query.where('provider', isEqualTo: users.docs.first.id);
+      events = events.where('provider', isEqualTo: users.docs.first.id);
+
+      listofEvents.add(Container(
+          padding: EdgeInsets.only(top: 20),
+          child: new Text('$provider has created these events : ',
+              style: TextStyle(color: Colors.white, fontSize: 20.0))));
     }
 
     if (user != "") {
-      query = query.where('attendees', arrayContains: user);
+      events = events.where('attendees', arrayContains: user);
+      listofEvents.add(Container(
+          padding: EdgeInsets.only(top: 20),
+          child: new Text('$user is participating to these events : ',
+              style: TextStyle(color: Colors.white, fontSize: 20.0))));
     }
 
-    //we store all the events into this List.
-    List<Widget> listofEvents = [];
-
     //await is necessary to wait for the asynchronous call.
-    await query.get().then((querySnapshot) {
+    await events.get().then((querySnapshot) {
       if (querySnapshot.size == 0) {
         //return Text('No event is corresponding to the filters');
         listofEvents.add(Container(

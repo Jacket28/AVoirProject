@@ -188,7 +188,7 @@ class FilterState extends State<FilterPage> {
                                       return new DropdownMenuItem(
                                         value: provider,
                                         child: Text(
-                                          "$provider",
+                                          provider,
                                           textAlign: TextAlign.center,
                                         ),
                                       );

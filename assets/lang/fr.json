@@ -13,6 +13,7 @@
   "selectedDate": "date choisie",
   "user": "utilisateur",
   "language": "lang",
-  "bug_notice_notify": "Si vous trouvez un bug, envoyez nous un message"
+  "bug_notice_notify": "Si vous trouvez un bug, envoyez nous un message",
+  "new_user":"Créer un nouvel utilisateur ?"
 
 }

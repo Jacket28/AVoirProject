@@ -13,6 +13,7 @@
   "selectedDate": "selected date",
   "user": "user",
   "language": "language",
-  "bug_notice_notify": "If you notice a bug, please notify us :)"
+  "bug_notice_notify": "If you notice a bug, please notify us :)",
+  "new_user":"New user ?"
 
 }

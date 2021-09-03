@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/pages/createAccountPage.dart';
 import 'package:a_voir_app/pages/settingsPage.dart';
@@ -201,7 +202,7 @@ class LoginPageState extends State<LoginPage> {
                   height: 30,
                 ),
                 Text(
-                  "New user ?",
+                  getTranslated(context, "new_user")!,
                   style: TextStyle(fontSize: 20, color: Colors.white),
                 ),
                 Column(

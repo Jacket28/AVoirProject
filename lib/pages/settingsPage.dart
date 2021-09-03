@@ -19,8 +19,11 @@ class SettingsPage extends StatefulWidget {
 }
 
 class SettingsState extends State<SettingsPage> {
+  Language? selectedLanguage = Language.getDefaultLanguage();
+
 //should change the language when we click on the OnChanged
   void _changeLanguage(Language language) async {
+    selectedLanguage = language;
     Locale _locale = await setLocale(language.languageCode);
     MyApp.setLocale(context, _locale);
   }
@@ -58,6 +61,24 @@ class SettingsState extends State<SettingsPage> {
             Padding(
               padding: EdgeInsets.symmetric(vertical: 10),
             ),
+
+            // Container(
+            //   padding: EdgeInsets.symmetric(horizontal: 20),
+            //   decoration: BoxDecoration(
+            //     borderRadius: BorderRadius.circular(25),
+            //     color: Colors.white,
+            //   ),
+            //   width: 132,
+            //   child: TextButton(
+            //     child: const Text(
+            //       'Change lang',
+            //       style: TextStyle(color: Color(0xffa456a7)),
+            //     ),
+            //     onPressed: () {
+            //       _changeLanguage(Language.languageList()[1]);
+            //     },
+            //   ),
+            // ),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
@@ -65,58 +86,25 @@ class SettingsState extends State<SettingsPage> {
                 color: Colors.white,
               ),
               width: 132,
-              child: TextButton(
-                child: const Text(
-                  'Change lang',
-                  style: TextStyle(color: Color(0xffa456a7)),
-                ),
-                onPressed: () {
-                  _changeLanguage(Language.languageList()[1]);
-                },
-              ),
-            ),
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(25),
-                color: Colors.white,
-              ),
-              width: 132,
-              child: DropdownButton(
-                //value: dropdownvalue,
-                underline: SizedBox(),
-                dropdownColor: Colors.white,
-                focusColor: Colors.white,
-                icon: Icon(
-                  Icons.keyboard_arrow_down,
-                  color: Colors.black,
-                ),
-
-                onChanged: (Language? language) {
-                  _changeLanguage(Language.languageList()[1]);
-                },
-
-                items: Language.languageList()
-                    .map<DropdownMenuItem<Language>>(
-                      (lang) => DropdownMenuItem<Language>(
-                        value: lang,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: <Widget>[Text(lang.name)],
-                        ),
-                      ),
-                    )
-                    .toList(),
-                //old code
-                /*items: items.map((String items) {
-                    return DropdownMenuItem(value: items, child: Text(items));
+              child: DropdownButton<Language>(
+                  hint: Text(selectedLanguage!.name),
+                  items: Language.languageList().map((Language lang) {
+                    return DropdownMenuItem<Language>(
+                      value: lang,
+                      child: Text(lang.name),
+                    );
                   }).toList(),
-                  onChanged: (String? newValue) {
-                    setState(() {
-                      dropdownvalue = newValue!;
-                    });
-                  }*/
-              ),
+                  //value: dropdownvalue,
+                  underline: SizedBox(),
+                  dropdownColor: Colors.white,
+                  focusColor: Colors.white,
+                  icon: Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Colors.black,
+                  ),
+                  onChanged: (Language? newLanguage) {
+                    _changeLanguage(newLanguage!);
+                  }),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 100, bottom: 15),

@@ -1,3 +1,7 @@
+import 'dart:html';
+import 'dart:io';
+
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/main.dart';
 import 'package:a_voir_app/models/language.dart';
 import 'package:a_voir_app/translations.dart';
@@ -6,7 +10,7 @@ import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
+import 'dart:developer' as developer;
 import 'feedbackPage.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -15,23 +19,10 @@ class SettingsPage extends StatefulWidget {
 }
 
 class SettingsState extends State<SettingsPage> {
-  //String dropdownvalue = 'English';
-  //var items = ['English', 'French'];
-
 //should change the language when we click on the OnChanged
-  void _changeLanguage(Language? language) {
-    Locale _temp;
-    switch (language?.languageCode) {
-      case 'en':
-        _temp = Locale(language!.languageCode, 'US');
-        break;
-      case 'fr':
-        _temp = Locale(language!.languageCode, 'FR');
-        break;
-      default:
-        _temp = Locale(language!.languageCode, 'US');
-    }
-    MyApp.setLocale(context, _temp);
+  void _changeLanguage(Language language) async {
+    Locale _locale = await setLocale(language.languageCode);
+    MyApp.setLocale(context, _locale);
   }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
@@ -53,19 +44,36 @@ class SettingsState extends State<SettingsPage> {
             ),
             Container(
                 child: Center(
-              child: //Text(Translations.of(context).translate('language')),
-                  Text(
-                'Language : ',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontSize: 20.0,
-                    color: Color(
-                      0xffffffff,
-                    )),
-              ),
+              child: Text(getTranslated(context, 'title')!),
+              //     Text(
+              //   'Language : ',
+              //   textAlign: TextAlign.center,
+              //   style: TextStyle(
+              //       fontSize: 20.0,
+              //       color: Color(
+              //         0xffffffff,
+              //       )),
+              // ),
             )),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 10),
+            ),
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 20),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(25),
+                color: Colors.white,
+              ),
+              width: 132,
+              child: TextButton(
+                child: const Text(
+                  'Change lang',
+                  style: TextStyle(color: Color(0xffa456a7)),
+                ),
+                onPressed: () {
+                  _changeLanguage(Language.languageList()[1]);
+                },
+              ),
             ),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20),
@@ -85,7 +93,7 @@ class SettingsState extends State<SettingsPage> {
                 ),
 
                 onChanged: (Language? language) {
-                  _changeLanguage(language);
+                  _changeLanguage(Language.languageList()[1]);
                 },
 
                 items: Language.languageList()
@@ -123,7 +131,7 @@ class SettingsState extends State<SettingsPage> {
             Container(
                 child: Center(
               child: Text(
-                'If you notice a bug, please notify us :)',
+                getTranslated(context, 'bug_notice_notify')!,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 20.0,

@@ -1,0 +1,18 @@
+{
+  "title": "title",
+  "description": "description",
+  "address": "address",
+  "npa": "npa",
+  "city": "city",
+  "date": "date",
+  "time": "time",
+  "provider": "provider",
+  "attendees": "attendees",
+  "url": "url",
+  "dateTime": "dateTime",
+  "selectedDate": "selected date",
+  "user": "user",
+  "language": "language",
+  "bug_notice_notify": "If you notice a bug, please notify us :)"
+
+}

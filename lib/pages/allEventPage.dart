@@ -72,9 +72,11 @@ class _AllEventState extends State<AllEventPage> {
 
 //This method is used to build the interface of the page based uppon the gotten events from the DB.
   Future<List<Widget>> _getEvent(BuildContext context) async {
-    final events = FirebaseFirestore.instance.collection("events").where('date',
+    final events = FirebaseFirestore.instance.collection(
+            "events") /*.where('date',
         isGreaterThanOrEqualTo:
-            DateFormat.yMd().format(DateTime.now()).toString());
+            DateFormat.yMd().format(DateTime.now()).toString())*/
+        ;
     //we store all the events into this List.
     List<Widget> listofEvents = [];
 
@@ -82,60 +84,65 @@ class _AllEventState extends State<AllEventPage> {
     await events.get().then((querySnapshot) {
       if (querySnapshot.size == 0) {
         //return Text('No event is corresponding to the filters');
-        listofEvents.add(Container(
+        return Container(
             padding: EdgeInsets.only(top: 20),
             child: new Text('No event is available',
-                style: TextStyle(color: Colors.white, fontSize: 20.0))));
+                style: TextStyle(color: Colors.white, fontSize: 20.0)));
       }
+
       querySnapshot.docs.forEach((result) {
-        listofEvents.add(Center(
-            child: TextButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => EventPage(eventId: result.id)),
-                  );
-                },
-                child: Container(
-                    alignment: Alignment.topCenter,
-                    width: 500,
-                    height: 300,
-                    margin: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: Color(0xff643165),
-                      border: Border.all(color: Colors.white),
-                      shape: BoxShape.rectangle,
-                      borderRadius: new BorderRadius.circular(25.0),
-                    ),
-                    child: Column(children: [
-                      Padding(padding: EdgeInsets.only(top: 10)),
-                      Text(
-                        result.get("title"),
-                        style: TextStyle(fontSize: 20, color: Colors.white),
+        String myDate = result['date'] as String;
+        var dateSplited = myDate.split('/');
+        if (_isFutur(dateSplited)) {
+          listofEvents.add(Center(
+              child: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => EventPage(eventId: result.id)),
+                    );
+                  },
+                  child: Container(
+                      alignment: Alignment.topCenter,
+                      width: 500,
+                      height: 300,
+                      margin: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: Color(0xff643165),
+                        border: Border.all(color: Colors.white),
+                        shape: BoxShape.rectangle,
+                        borderRadius: new BorderRadius.circular(25.0),
                       ),
-                      Container(
-                        padding: EdgeInsets.only(top: 10),
-                        width: 300,
-                        height: 200,
-                        child: Image.network(
-                          result.get("url"),
-                          fit: BoxFit.cover,
+                      child: Column(children: [
+                        Padding(padding: EdgeInsets.only(top: 10)),
+                        Text(
+                          result.get("title"),
+                          style: TextStyle(fontSize: 20, color: Colors.white),
                         ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(top: 10),
-                      ),
-                      Text(
-                        result.get("city"),
-                        style: TextStyle(fontSize: 20, color: Colors.white),
-                      ),
-                      Text(
-                        result.get("date"),
-                        style: TextStyle(fontSize: 20, color: Colors.white),
-                      ),
-                    ])))));
-        //}
+                        Container(
+                          padding: EdgeInsets.only(top: 10),
+                          width: 300,
+                          height: 200,
+                          child: Image.network(
+                            result.get("url"),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsets.only(top: 10),
+                        ),
+                        Text(
+                          result.get("city"),
+                          style: TextStyle(fontSize: 20, color: Colors.white),
+                        ),
+                        Text(
+                          result.get("date"),
+                          style: TextStyle(fontSize: 20, color: Colors.white),
+                        ),
+                      ])))));
+          //}
+        }
       });
     });
     await Future.delayed(Duration(seconds: 1));
@@ -173,5 +180,25 @@ class _AllEventState extends State<AllEventPage> {
     final Size size = MediaQuery.of(context).size;
 
     return Container(height: 100, width: size.width, child: BottomNavBarV2());
+  }
+
+  bool _isFutur(List<String> dateSplited) {
+    int year = int.parse(DateFormat.y().format(DateTime.now()));
+    int month = int.parse(DateFormat.M().format(DateTime.now()));
+    int day = int.parse(DateFormat.d().format(DateTime.now()));
+
+    if (int.parse(dateSplited[2]) > year) {
+      print('year is superior');
+      return true;
+    }
+
+    if (int.parse(dateSplited[2]) == year) {
+      if (int.parse(dateSplited[0]) >= month) {
+        if (int.parse(dateSplited[1]) >= day) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }

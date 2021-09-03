@@ -31,5 +31,7 @@
   "select_time_future" : "Please make sure that the selected time is in the future",
   "approve": "Approve",
   "not_all_fields_filled": "Not all fields are correctly filled",
-  "fields_filled_correctly": "Please make sure that every fields are filled correctly."
+  "fields_filled_correctly": "Please make sure that every fields are filled correctly.",
+  "new_user":"New user ?"
+
 }

@@ -31,5 +31,7 @@
   "select_time_future" : "Veuillez vous assurer que l'heure sélectionnée se situe dans le futur.",
   "approve": "Approuver",
   "not_all_fields_filled": "Tous les champs ne sont pas correctement remplis",
-  "fields_filled_correctly": "Veuillez vous assurer que tous les champs sont remplis correctement."
+  "fields_filled_correctly": "Veuillez vous assurer que tous les champs sont remplis correctement.",
+  "new_user":"Créer un nouvel utilisateur ?"
+
 }

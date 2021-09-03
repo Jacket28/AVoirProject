@@ -44,7 +44,14 @@ class SettingsState extends State<SettingsPage> {
             ),
             Container(
                 child: Center(
-              child: Text(getTranslated(context, 'title')!),
+              child: Text(
+                getTranslated(context, 'language')!,
+                style: TextStyle(
+                    fontSize: 20.0,
+                    color: Color(
+                      0xffffffff,
+                    )),
+              ),
               //     Text(
               //   'Language : ',
               //   textAlign: TextAlign.center,

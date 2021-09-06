@@ -1,3 +1,4 @@
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:a_voir_app/pages/addEventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
@@ -146,7 +147,7 @@ class EventState extends State<EventPage> {
                     ),
                   ),
                   Text(
-                    'Event',
+                    getTranslated(context, 'event')!,
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   _addUpdateButton(context, snapshot.data!.provider)
@@ -159,7 +160,7 @@ class EventState extends State<EventPage> {
                   ),
                   Text(
                     //Creator section
-                    "Creator : ",
+                    getTranslated(context, 'creator')!,
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   Padding(
@@ -201,7 +202,7 @@ class EventState extends State<EventPage> {
                   ),
                   Text(
                     //Subject section
-                    "Subject : ",
+                    getTranslated(context, 'subject')!,
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   Padding(
@@ -222,7 +223,7 @@ class EventState extends State<EventPage> {
                   ),
                   Text(
                     //Date section
-                    "Date : ",
+                    getTranslated(context, 'date2')!,
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   Padding(
@@ -241,7 +242,7 @@ class EventState extends State<EventPage> {
                   ),
                   Text(
                     //Time section
-                    "Time : ",
+                    getTranslated(context, 'time2')!,
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   Padding(
@@ -260,7 +261,7 @@ class EventState extends State<EventPage> {
                   ),
                   Text(
                     //Location section
-                    "Location : ",
+                    getTranslated(context, 'location2')!,
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   Padding(
@@ -287,7 +288,7 @@ class EventState extends State<EventPage> {
                     padding: EdgeInsets.only(bottom: 20, top: 20, left: 80),
                     child: Text(
                       //description section
-                      "Description : ",
+                      getTranslated(context, 'description2')!,
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
                   ),
@@ -316,7 +317,7 @@ class EventState extends State<EventPage> {
                     padding: EdgeInsets.only(top: 20, bottom: 10, left: 80),
                     child: Text(
                       //attendants section
-                      "Attendants : ",
+                      getTranslated(context, 'attendants')!,
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
                   ),
@@ -410,7 +411,7 @@ class EventState extends State<EventPage> {
                 //Will be used later to take part the event
                 Container(
                     child: new Text(
-                  "Participate",
+                  getTranslated(context, 'participate')!,
                   style: TextStyle(color: Color(0xffa456a7), fontSize: 20.0),
                 ))
               ],
@@ -468,9 +469,9 @@ class EventState extends State<EventPage> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text("Participate"),
+      title: Text(getTranslated(context, 'participate')!),
       content: Text(
-        "You are already participating to this event !",
+        getTranslated(context, 'already_participating')!,
         style: TextStyle(color: Color(0xffa456a7)),
       ),
       actions: [
@@ -492,13 +493,15 @@ class EventState extends State<EventPage> {
 
     // set up the buttons
     Widget cancelButton = TextButton(
-      child: Text("Cancel", style: TextStyle(color: Colors.red)),
+      child: Text(getTranslated(context, 'cancel')!,
+          style: TextStyle(color: Colors.red)),
       onPressed: () {
         Navigator.of(context).pop();
       },
     );
     Widget continueButton = TextButton(
-      child: Text("Approve", style: TextStyle(color: Color(0xffa456a7))),
+      child: Text(getTranslated(context, 'approve')!,
+          style: TextStyle(color: Color(0xffa456a7))),
       onPressed: () {
         var attendeesRef =
             FirebaseFirestore.instance.collection("events").doc(eventId);
@@ -514,9 +517,9 @@ class EventState extends State<EventPage> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text("Participate"),
+      title: Text(getTranslated(context, 'participate')!),
       content: Text(
-        "Would you like to participate to this event ?",
+        getTranslated(context, 'participate_to_the_event')!,
         style: TextStyle(color: Color(0xffa456a7)),
       ),
       actions: [

@@ -97,10 +97,10 @@ class LoginPageState extends State<LoginPage> {
                             validator: (value) {
                               //handle errors with email submission
                               if (value == null || value.isEmpty) {
-                                return "Please enter your Email";
+                                return getTranslated(context, 'enter_mail')!;
                               }
                               if (!value.contains("@"))
-                                return "Please enter a valid Email";
+                                return getTranslated(context, 'valid_mail')!;
                             },
                             style: TextStyle(color: Colors.white),
                             decoration: InputDecoration(
@@ -115,10 +115,10 @@ class LoginPageState extends State<LoginPage> {
                                   borderRadius: new BorderRadius.circular(25.0),
                                   borderSide: BorderSide(color: Colors.white),
                                 ),
-                                labelText: 'Email',
+                                labelText: getTranslated(context, 'email')!,
                                 labelStyle: TextStyle(color: Colors.grey),
                                 hintText:
-                                    'Enter a valid email as abc@gmail.com'),
+                                    getTranslated(context, 'valid_mail_as')!),
                           ),
                         ),
                         Container(
@@ -130,7 +130,8 @@ class LoginPageState extends State<LoginPage> {
                             validator: (value) {
                               //handle errors with Password submission
                               if (value == null || value.isEmpty) {
-                                return "Please enter your Password";
+                                return getTranslated(
+                                    context, 'please_enter_password')!;
                               }
                               return null;
                             },
@@ -148,9 +149,10 @@ class LoginPageState extends State<LoginPage> {
                                   borderRadius: new BorderRadius.circular(25.0),
                                   borderSide: BorderSide(color: Colors.white),
                                 ),
-                                labelText: 'Password',
+                                labelText: getTranslated(context, 'password')!,
                                 labelStyle: TextStyle(color: Colors.grey),
-                                hintText: 'Enter your password'),
+                                hintText:
+                                    getTranslated(context, 'enter_password')!),
                           ),
                         ),
                         Container(
@@ -159,7 +161,7 @@ class LoginPageState extends State<LoginPage> {
                           child: Center(
                             child: RoundedLoadingButton(
                               color: Color(0xffa456a7),
-                              child: Text('Log In',
+                              child: Text(getTranslated(context, 'login')!,
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 18)),
                               controller: _btnController,
@@ -182,7 +184,8 @@ class LoginPageState extends State<LoginPage> {
                                         content: new Row(
                                           children: [
                                             new CircularProgressIndicator(),
-                                            new Text("   Signin in...")
+                                            new Text(getTranslated(
+                                                context, 'Signin_in')!)
                                           ],
                                         )),
                                   );
@@ -224,7 +227,7 @@ class LoginPageState extends State<LoginPage> {
                           }
                         });
                       },
-                      child: Text('Create account',
+                      child: Text(getTranslated(context, 'createaccount')!,
                           style: TextStyle(
                               decoration: TextDecoration.underline,
                               fontSize: 20.0,
@@ -275,7 +278,8 @@ class LoginPageState extends State<LoginPage> {
       showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-              title: Text("Ops! Login Failed"), content: Text('${e.message}')));
+              title: Text(getTranslated(context, 'login_failed')!),
+              content: Text('${e.message}')));
     }
     if (_isLoginCorrect == true) {
       _setreferences(context, mail);

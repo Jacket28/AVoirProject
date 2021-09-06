@@ -1,3 +1,4 @@
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/pages/EventPage.dart';
 import 'package:a_voir_app/pages/filterPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
@@ -58,7 +59,7 @@ class _AllEventState extends State<AllEventPage> {
                                   //Will be used later to take part the event
                                   Container(
                                       child: new Text(
-                                    "Filter",
+                                    getTranslated(context, 'filter')!,
                                     style: TextStyle(
                                         color: Color(0xffa456a7),
                                         fontSize: 20.0),

@@ -154,7 +154,7 @@ class SettingsState extends State<SettingsPage> {
                     },
 
                     child: Text(
-                      'Notify',
+                      getTranslated(context, 'notify')!,
                       style:
                           TextStyle(fontSize: 20.0, color: Color(0xffa456a7)),
                     ),

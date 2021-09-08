@@ -379,11 +379,14 @@ class AddEventState extends State<AddEventPage> {
                                     height: 150,
                                     width: 200,
                                     child: _pickedImage != ""
-                                        ? kIsWeb
+                                        ? _myEvent.hasId()
                                             ? Image.network(_pickedImage,
                                                 fit: BoxFit.fill)
-                                            : Image.file(File(_pickedImage),
-                                                fit: BoxFit.fill)
+                                            : kIsWeb
+                                                ? Image.network(_pickedImage,
+                                                    fit: BoxFit.fill)
+                                                : Image.file(File(_pickedImage),
+                                                    fit: BoxFit.fill)
                                         : Icon(
                                             Icons.photo,
                                             color: Color(0xff643165),

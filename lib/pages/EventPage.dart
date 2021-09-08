@@ -138,7 +138,7 @@ class EventState extends State<EventPage> {
               Row(
                 children: <Widget>[
                   IconButton(
-                    padding: EdgeInsets.only(left: 30, right: 110),
+                    padding: EdgeInsets.only(left: 30, right: 100),
                     onPressed: () => share(context, myEvent),
                     icon: Image.asset(
                       "assets/images/share.png",
@@ -377,7 +377,7 @@ class EventState extends State<EventPage> {
   Widget _addUpdateButton(BuildContext context, String provider) {
     if (prefs!.getString('userId')!.compareTo(provider) == 0) {
       return IconButton(
-        padding: EdgeInsets.only(left: 120),
+        padding: EdgeInsets.only(left: 80),
         onPressed: () {
           Navigator.push(
             context,

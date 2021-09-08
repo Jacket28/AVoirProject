@@ -1,6 +1,3 @@
-import 'dart:html';
-import 'dart:io';
-
 import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/main.dart';
 import 'package:a_voir_app/models/language.dart';

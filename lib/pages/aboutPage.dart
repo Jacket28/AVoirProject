@@ -1,3 +1,4 @@
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -49,14 +50,18 @@ class AboutState extends State<AboutPage> {
                 height: 100,
                 width: 300,
                 child: Text(
-                  "This application has been created as part of the module 645-2 at the University of Applied Sciences Western Switzerland.",
+                  getTranslated(context, 'application_resume')!,
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
+                /*child: Text(
+                  "This application has been created as part of the module 645-2 at the University of Applied Sciences Western Switzerland.",
+                  style: TextStyle(color: Colors.white, fontSize: 20),
+                ),*/
               ),
               Padding(
                 padding: EdgeInsets.only(top: 20),
               ),
-              Text("DEV Team",
+              Text(getTranslated(context, 'dev_team')!,
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -70,7 +75,7 @@ class AboutState extends State<AboutPage> {
               Padding(
                 padding: EdgeInsets.only(top: 20),
               ),
-              Text("Product Owner",
+              Text(getTranslated(context, 'product_owner')!,
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,
@@ -83,7 +88,7 @@ class AboutState extends State<AboutPage> {
               Padding(
                 padding: EdgeInsets.only(top: 20),
               ),
-              Text("Professor in charge",
+              Text(getTranslated(context, 'prof_in_charge')!,
                   style: TextStyle(
                       color: Colors.white,
                       fontSize: 20,

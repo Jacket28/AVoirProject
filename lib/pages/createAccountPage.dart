@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/models/MyUser.dart';
 import 'package:a_voir_app/pages/loginPage.dart';
 import 'package:a_voir_app/pages/tutoPage.dart';
@@ -78,7 +79,7 @@ class CreateAccountState extends State<CreateAccountPage> {
                           const EdgeInsets.only(left: 20, top: 80, bottom: 30),
                       child: Center(
                         child: Text(
-                          "It's a pleasure to welcome you !",
+                          getTranslated(context, 'welcome_message')!,
                           style: TextStyle(
                               fontSize: 20.0, color: Color(0xffffffff)),
                         ),
@@ -115,7 +116,8 @@ class CreateAccountState extends State<CreateAccountPage> {
                                 validator: (value) {
                                   //handle errors with Username submission
                                   if (value == null || value.isEmpty) {
-                                    return "Please enter your Username";
+                                    return getTranslated(
+                                        context, 'username_message')!;
                                   }
                                   _myUser.username = value;
                                 },
@@ -140,9 +142,11 @@ class CreateAccountState extends State<CreateAccountPage> {
                                       borderSide:
                                           BorderSide(color: Colors.white),
                                     ),
-                                    labelText: 'Username',
+                                    labelText:
+                                        getTranslated(context, 'username')!,
                                     labelStyle: TextStyle(color: Colors.grey),
-                                    hintText: 'Username'),
+                                    hintText:
+                                        getTranslated(context, 'username')!),
                               ),
                             ),
                             Padding(
@@ -154,9 +158,11 @@ class CreateAccountState extends State<CreateAccountPage> {
                                 validator: (value) {
                                   //handle errors with Email submission
                                   if (value == null || value.isEmpty) {
-                                    return "Please enter your Mail";
+                                    return getTranslated(
+                                        context, 'enter_mail')!;
                                   } else if (!value.contains("@")) {
-                                    return "Please enter a valid Email";
+                                    return getTranslated(
+                                        context, 'valid_mail')!;
                                   }
                                   _myUser.email = value;
                                 },
@@ -178,9 +184,9 @@ class CreateAccountState extends State<CreateAccountPage> {
                                       borderSide:
                                           BorderSide(color: Colors.white),
                                     ),
-                                    labelText: 'E-mail',
+                                    labelText: getTranslated(context, 'email')!,
                                     labelStyle: TextStyle(color: Colors.grey),
-                                    hintText: 'E-mail'),
+                                    hintText: getTranslated(context, 'email')!),
                               ),
                             ),
                             _validPassword
@@ -218,9 +224,11 @@ class CreateAccountState extends State<CreateAccountPage> {
                                         borderSide:
                                             BorderSide(color: Colors.white),
                                       ),
-                                      labelText: 'Password',
+                                      labelText:
+                                          getTranslated(context, 'password')!,
                                       labelStyle: TextStyle(color: Colors.grey),
-                                      hintText: 'Password'),
+                                      hintText:
+                                          getTranslated(context, 'password')!),
                                 )),
                             Padding(
                               //padding: const EdgeInsets.only(left:15.0,right: 15.0,top:0,bottom: 0),
@@ -231,10 +239,12 @@ class CreateAccountState extends State<CreateAccountPage> {
                                 validator: (value) {
                                   //handle errors with Password submission
                                   if (value == null || value.isEmpty) {
-                                    return "Please verify your Password";
+                                    return getTranslated(
+                                        context, 'please_verify_password')!;
                                   } else if (value !=
                                       _passwordController.text) {
-                                    return "Your passwords must be identical !";
+                                    return getTranslated(
+                                        context, 'identical_password')!;
                                   }
                                   var bytes = utf8.encode(value);
                                   var digest = sha512.convert(bytes);
@@ -262,9 +272,11 @@ class CreateAccountState extends State<CreateAccountPage> {
                                       borderSide:
                                           BorderSide(color: Colors.white),
                                     ),
-                                    labelText: 'Verify your password',
+                                    labelText: getTranslated(
+                                        context, 'verify_password')!,
                                     labelStyle: TextStyle(color: Colors.grey),
-                                    hintText: 'Password'),
+                                    hintText:
+                                        getTranslated(context, 'password')!),
                               ),
                             ),
                             Padding(
@@ -274,11 +286,13 @@ class CreateAccountState extends State<CreateAccountPage> {
                                 padding: EdgeInsets.only(left: 80),
                                 child: Row(
                                   children: [
-                                    Text("Service Provider Account ?   ",
+                                    Text(
+                                        getTranslated(
+                                            context, 'service_provider')!,
                                         style: TextStyle(color: Colors.white)),
                                     MyTooltip(
-                                        message:
-                                            "A service provider account is required \n if you want to add your own events !",
+                                        message: getTranslated(context,
+                                            'service_provider_details')!,
                                         child: Image.asset(
                                           'assets/images/infoTip.png',
                                           height: 15,
@@ -310,7 +324,9 @@ class CreateAccountState extends State<CreateAccountPage> {
                                 child: Center(
                                   child: RoundedLoadingButton(
                                       color: Color(0xffa456a7),
-                                      child: Text('Create your account !',
+                                      child: Text(
+                                          getTranslated(
+                                              context, 'create_your_account')!,
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 15)),
@@ -320,15 +336,19 @@ class CreateAccountState extends State<CreateAccountPage> {
                                             _pickedImage != null) {
                                           if (serviceProvider == false) {
                                             AlertDialog alert = AlertDialog(
-                                              title: Text("Warning"),
+                                              title: Text(getTranslated(
+                                                  context, 'warning')!),
                                               content: Text(
-                                                "You are not Service Provider, which means you cannot create events. Do you wish to continue ?",
+                                                getTranslated(context,
+                                                    'not_service_provider_message')!,
                                                 style: TextStyle(
                                                     color: Color(0xffa456a7)),
                                               ),
                                               actions: [
                                                 TextButton(
-                                                    child: Text("Cancel",
+                                                    child: Text(
+                                                        getTranslated(
+                                                            context, 'cancel')!,
                                                         style: TextStyle(
                                                             color: Colors.red)),
                                                     onPressed: () {
@@ -336,7 +356,9 @@ class CreateAccountState extends State<CreateAccountPage> {
                                                       _buttonReset();
                                                     }),
                                                 TextButton(
-                                                    child: Text("OK",
+                                                    child: Text(
+                                                        getTranslated(context,
+                                                            'ok_message')!,
                                                         style: TextStyle(
                                                             color: Color(
                                                                 0xffa456a7))),
@@ -386,15 +408,19 @@ class CreateAccountState extends State<CreateAccountPage> {
                                           _validPassword = false;
 
                                           AlertDialog alert = AlertDialog(
-                                            title: Text("Creating account"),
+                                            title: Text(getTranslated(
+                                                context, 'create_account')!),
                                             content: Text(
-                                              "Check everything as been filled !",
+                                              getTranslated(context,
+                                                  'everything_as_been_filled')!,
                                               style: TextStyle(
                                                   color: Color(0xffa456a7)),
                                             ),
                                             actions: [
                                               TextButton(
-                                                  child: Text("OK",
+                                                  child: Text(
+                                                      getTranslated(context,
+                                                          'ok_message')!,
                                                       style: TextStyle(
                                                           color: Color(
                                                               0xffa456a7))),
@@ -436,11 +462,11 @@ class CreateAccountState extends State<CreateAccountPage> {
       Navigator.of(context).pop();
     } catch (error) {
       AlertDialog(
-        title: const Text('Something went wrong'),
+        title: Text(getTranslated(context, 'wrong_message')!),
         content: SingleChildScrollView(
           child: ListBody(
-            children: const <Widget>[
-              Text('Please make sure that your picture is a .jpg or .png file'),
+            children: <Widget>[
+              Text(getTranslated(context, 'check_photo_format')!),
             ],
           ),
         ),
@@ -508,7 +534,7 @@ class CreateAccountState extends State<CreateAccountPage> {
       showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-              title: Text("Ops! Creation of Account Failed"),
+              title: Text(getTranslated(context, 'creation_account_failed')!),
               content: Text('${e.message}')));
     }
     if (_isCreationAccountCorrect == true) {
@@ -520,7 +546,7 @@ class CreateAccountState extends State<CreateAccountPage> {
               children: [
                 new CircularProgressIndicator(),
                 new Text(
-                  "   Creating your account",
+                  getTranslated(context, 'creating_your_account')!,
                 )
               ],
             )),

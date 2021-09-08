@@ -1,3 +1,4 @@
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/pages/aboutPage.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/pages/filterEventPage.dart';
@@ -76,7 +77,7 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
                           width: 40,
                         ),
                         title: Text(
-                          "My events",
+                          getTranslated(context, 'my_events')!,
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
                       ),
@@ -100,7 +101,7 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
                           width: 40,
                         ),
                         title: Text(
-                          "All events",
+                          getTranslated(context, 'all_events')!,
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
                       ),
@@ -123,7 +124,7 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
                           width: 40,
                         ),
                         title: Text(
-                          "Search",
+                          getTranslated(context, 'search')!,
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
                       ),
@@ -147,7 +148,7 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
                           width: 40,
                         ),
                         title: Text(
-                          "Settings",
+                          getTranslated(context, 'settings')!,
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
                       ),
@@ -172,7 +173,7 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
                           width: 40,
                         ),
                         title: Text(
-                          "Subscription",
+                          getTranslated(context, 'subscription')!,
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
                       ),
@@ -195,7 +196,7 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
                           width: 40,
                         ),
                         title: Text(
-                          "About",
+                          getTranslated(context, 'about')!,
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
                       ),
@@ -221,7 +222,7 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
                           width: 40,
                         ),
                         title: Text(
-                          "Log out",
+                          getTranslated(context, 'log_out')!,
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
                       ),

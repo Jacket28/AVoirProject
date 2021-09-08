@@ -1,3 +1,4 @@
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/pages/EventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';

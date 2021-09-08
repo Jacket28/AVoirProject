@@ -1,5 +1,7 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
@@ -52,6 +54,7 @@ class AddEventState extends State<AddEventPage> {
   bool isEditing = false;
 
   String _pickedImage = "";
+  var _imageForAPI;
 
   String url = "";
 
@@ -134,7 +137,7 @@ class AddEventState extends State<AddEventPage> {
                             ),
                             Text(
                               //Title section
-                              "Title",
+                              getTranslated(context, 'title')!,
                               style:
                                   TextStyle(color: Colors.white, fontSize: 20),
                             ),
@@ -146,25 +149,26 @@ class AddEventState extends State<AddEventPage> {
                                     controller: _titleController,
                                     style: TextStyle(color: Colors.white),
                                     decoration: InputDecoration(
-                                        counterStyle:
-                                            TextStyle(color: Colors.white),
-                                        hintStyle:
-                                            TextStyle(color: Colors.grey),
-                                        enabledBorder: new OutlineInputBorder(
-                                          borderRadius:
-                                              new BorderRadius.circular(25.0),
-                                          borderSide:
-                                              BorderSide(color: Colors.white),
-                                        ),
-                                        focusedBorder: new OutlineInputBorder(
-                                          borderRadius:
-                                              new BorderRadius.circular(25.0),
-                                          borderSide:
-                                              BorderSide(color: Colors.white),
-                                        ),
-                                        labelStyle:
-                                            TextStyle(color: Colors.white),
-                                        hintText: 'Subject of Event.'),
+                                      counterStyle:
+                                          TextStyle(color: Colors.white),
+                                      hintStyle: TextStyle(color: Colors.grey),
+                                      enabledBorder: new OutlineInputBorder(
+                                        borderRadius:
+                                            new BorderRadius.circular(25.0),
+                                        borderSide:
+                                            BorderSide(color: Colors.white),
+                                      ),
+                                      focusedBorder: new OutlineInputBorder(
+                                        borderRadius:
+                                            new BorderRadius.circular(25.0),
+                                        borderSide:
+                                            BorderSide(color: Colors.white),
+                                      ),
+                                      labelStyle:
+                                          TextStyle(color: Colors.white),
+                                      hintText: getTranslated(
+                                          context, 'event_subject')!,
+                                    ),
                                     onChanged: (text) {
                                       _myEvent.title = text;
                                     })),
@@ -175,7 +179,7 @@ class AddEventState extends State<AddEventPage> {
                                         EdgeInsets.only(top: 10, left: 65)),
                                 Text(
                                   //Date section
-                                  "Date",
+                                  getTranslated(context, 'date')!,
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 20),
                                 ),
@@ -184,7 +188,7 @@ class AddEventState extends State<AddEventPage> {
                                         EdgeInsets.only(top: 100, left: 145)),
                                 Text(
                                   //time section
-                                  "Time",
+                                  getTranslated(context, 'time')!,
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 20),
                                 ),
@@ -274,7 +278,7 @@ class AddEventState extends State<AddEventPage> {
                               ),
                               Text(
                                 //Location section
-                                "Location",
+                                getTranslated(context, 'location')!,
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
                               ),
@@ -300,7 +304,8 @@ class AddEventState extends State<AddEventPage> {
                                       ),
                                       labelStyle:
                                           TextStyle(color: Colors.white),
-                                      hintText: 'format : Address, Npa, City'),
+                                      hintText:
+                                          getTranslated(context, 'format')!),
                                   onChanged: (text) {
                                     List<String> temp = text.split(",");
                                     _myEvent.address = temp.elementAt(0);
@@ -314,7 +319,7 @@ class AddEventState extends State<AddEventPage> {
                               ),
                               Text(
                                 //Description of the events section
-                                "Description",
+                                getTranslated(context, 'description')!,
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
                               ),
@@ -347,7 +352,8 @@ class AddEventState extends State<AddEventPage> {
                                       ),
                                       labelStyle:
                                           TextStyle(color: Colors.white),
-                                      hintText: 'Description'),
+                                      hintText: getTranslated(
+                                          context, 'description')!),
                                   onChanged: (text) {
                                     _myEvent.description = text;
                                   },
@@ -358,7 +364,7 @@ class AddEventState extends State<AddEventPage> {
                               ),
                               Text(
                                 //Description of the events section
-                                "Picture",
+                                getTranslated(context, 'picture')!,
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
                               ),
@@ -373,8 +379,14 @@ class AddEventState extends State<AddEventPage> {
                                     height: 150,
                                     width: 200,
                                     child: _pickedImage != ""
-                                        ? Image.network(_pickedImage,
-                                            fit: BoxFit.fill)
+                                        ? _myEvent.hasId()
+                                            ? Image.network(_pickedImage,
+                                                fit: BoxFit.fill)
+                                            : kIsWeb
+                                                ? Image.network(_pickedImage,
+                                                    fit: BoxFit.fill)
+                                                : Image.file(File(_pickedImage),
+                                                    fit: BoxFit.fill)
                                         : Icon(
                                             Icons.photo,
                                             color: Color(0xff643165),
@@ -393,7 +405,7 @@ class AddEventState extends State<AddEventPage> {
                               TextButton(
                                 child: Container(
                                   height: 50,
-                                  width: 130,
+                                  width: 160,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.rectangle,
                                     color: Colors.white,
@@ -461,25 +473,35 @@ class AddEventState extends State<AddEventPage> {
       final picker = ImagePicker();
       final pickedImage = await picker.getImage(source: ImageSource.gallery);
       final pickedImageFile = pickedImage!.path;
+      final imageForApi;
+      if (kIsWeb)
+        imageForApi = await pickedImage.readAsBytes();
+      else
+        imageForApi = null;
       setState(() {
         _pickedImage = pickedImageFile;
+        _imageForAPI = imageForApi;
       });
     } on TypeError catch (exception) {
       Navigator.of(context).pop();
     } catch (error) {
       AlertDialog(
-        title: const Text('Something went wrong'),
+        title: Text(
+          getTranslated(context, 'wrong_message')!,
+        ),
         content: SingleChildScrollView(
           child: ListBody(
-            children: const <Widget>[
-              Text('Please make sure that your picture is a .jpg or .png file'),
+            children: <Widget>[
+              Text(
+                getTranslated(context, 'check_photo_format')!,
+              ),
             ],
           ),
         ),
         actions: <Widget>[
           TextButton(
-            child: const Text(
-              'OK',
+            child: Text(
+              getTranslated(context, 'ok_message')!,
               style: TextStyle(color: Color(0xffa456a7)),
             ),
             onPressed: () {
@@ -496,7 +518,12 @@ class AddEventState extends State<AddEventPage> {
         .ref()
         .child("eventImages")
         .child(_myEvent.title + ".jpg");
-    await ref.putFile(File(_pickedImage));
+
+    if (kIsWeb)
+      await ref.putData(_imageForAPI);
+    else
+      await ref.putFile(File(_pickedImage));
+
     url = await ref.getDownloadURL();
 
     return url;
@@ -504,9 +531,9 @@ class AddEventState extends State<AddEventPage> {
 
   //Submit button
   Widget _setButtonText(BuildContext context) {
-    String text = "Submit";
+    String text = getTranslated(context, 'submit_btn')!;
     if (isEditing) {
-      text = "Save";
+      text = getTranslated(context, 'save')!;
     }
     return new Text(
       text,
@@ -580,19 +607,18 @@ class AddEventState extends State<AddEventPage> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('You cannot select a previous time'),
+          title: Text(getTranslated(context, 'cant_select_time')!),
           content: SingleChildScrollView(
             child: ListBody(
-              children: const <Widget>[
-                Text(
-                    'Please make sure that the selected time is in the future'),
+              children: <Widget>[
+                Text(getTranslated(context, 'select_time_future')!),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text(
-                'Approve',
+              child: Text(
+                getTranslated(context, 'approve')!,
                 style: TextStyle(color: Color(0xffa456a7)),
               ),
               onPressed: () {
@@ -612,19 +638,18 @@ class AddEventState extends State<AddEventPage> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Not all fields are correctly filled'),
+          title: Text(getTranslated(context, 'not_all_fields_filled')!),
           content: SingleChildScrollView(
             child: ListBody(
-              children: const <Widget>[
-                Text(
-                    'Please make sure that every fields are filled correctly.'),
+              children: <Widget>[
+                Text(getTranslated(context, 'fields_filled_correctly')!),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text(
-                'Approve',
+              child: Text(
+                getTranslated(context, 'approve')!,
                 style: TextStyle(color: Color(0xffa456a7)),
               ),
               onPressed: () {

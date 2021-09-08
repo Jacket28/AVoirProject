@@ -1,9 +1,11 @@
+import 'package:a_voir_app/localization/language_constants.dart';
+import 'package:a_voir_app/main.dart';
+import 'package:a_voir_app/models/language.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-
 import 'feedbackPage.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -12,8 +14,14 @@ class SettingsPage extends StatefulWidget {
 }
 
 class SettingsState extends State<SettingsPage> {
-  String dropdownvalue = 'English';
-  var items = ['English', 'French'];
+  Language? selectedLanguage = Language.getDefaultLanguage();
+
+//should change the language when we click on the OnChanged
+  void _changeLanguage(Language language) async {
+    selectedLanguage = language;
+    Locale _locale = await setLocale(language.languageCode);
+    MyApp.setLocale(context, _locale);
+  }
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
@@ -35,8 +43,7 @@ class SettingsState extends State<SettingsPage> {
             Container(
                 child: Center(
               child: Text(
-                'Language : ',
-                textAlign: TextAlign.center,
+                getTranslated(context, 'language')!,
                 style: TextStyle(
                     fontSize: 20.0,
                     color: Color(
@@ -53,24 +60,26 @@ class SettingsState extends State<SettingsPage> {
                 borderRadius: BorderRadius.circular(25),
                 color: Colors.white,
               ),
-              width: 117,
-              child: DropdownButton(
-                value: dropdownvalue,
-                dropdownColor: Colors.white,
-                focusColor: Colors.white,
-                icon: Icon(
-                  Icons.keyboard_arrow_down,
-                  color: Colors.black,
-                ),
-                items: items.map((String items) {
-                  return DropdownMenuItem(value: items, child: Text(items));
-                }).toList(),
-                onChanged: (String? newValue) {
-                  setState(() {
-                    dropdownvalue = newValue!;
-                  });
-                },
-              ),
+              width: 132,
+              child: DropdownButton<Language>(
+                  hint: Text(selectedLanguage!.name),
+                  items: Language.languageList().map((Language lang) {
+                    return DropdownMenuItem<Language>(
+                      value: lang,
+                      child: Text(lang.name),
+                    );
+                  }).toList(),
+                  //value: dropdownvalue,
+                  underline: SizedBox(),
+                  dropdownColor: Colors.white,
+                  focusColor: Colors.white,
+                  icon: Icon(
+                    Icons.keyboard_arrow_down,
+                    color: Colors.black,
+                  ),
+                  onChanged: (Language? newLanguage) {
+                    _changeLanguage(newLanguage!);
+                  }),
             ),
             Padding(
               padding: const EdgeInsets.only(top: 100, bottom: 15),
@@ -85,7 +94,7 @@ class SettingsState extends State<SettingsPage> {
             Container(
                 child: Center(
               child: Text(
-                'If you notice a bug, please notify us :)',
+                getTranslated(context, 'bug_notice_notify')!,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 20.0,
@@ -113,7 +122,7 @@ class SettingsState extends State<SettingsPage> {
                     },
 
                     child: Text(
-                      'Notify',
+                      getTranslated(context, 'notify')!,
                       style:
                           TextStyle(fontSize: 20.0, color: Color(0xffa456a7)),
                     ),

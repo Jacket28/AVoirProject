@@ -1,3 +1,4 @@
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/pages/loginPage.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
@@ -12,10 +13,14 @@ class TutoState extends State<TutoPage> {
   final PageController _controller = PageController(initialPage: 0);
   double? _currentPage = 0;
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
   @override
   void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _pages = [
       Container(
         color: Color(0xffa456a7),
@@ -46,7 +51,7 @@ class TutoState extends State<TutoPage> {
               child: Center(
                 child: Container(
                     child: new Text(
-                  'With "A Voir ! " You can create \n your own artistic event and add \n whoever you want.',
+                  getTranslated(context, 'tuto_info_1')!,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontSize: 20.0,
@@ -107,7 +112,7 @@ class TutoState extends State<TutoPage> {
               child: Center(
                 child: Container(
                     child: new Text(
-                  'Share your events \n with your friends on \n social networks.',
+                  getTranslated(context, 'tuto_info_2')!,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontSize: 20.0,
@@ -149,7 +154,7 @@ class TutoState extends State<TutoPage> {
               child: Center(
                 child: Container(
                     child: new Text(
-                  'Be up to date by cheking \n what events are attended \n by who !',
+                  getTranslated(context, 'tuto_info_3')!,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                       fontSize: 20.0,
@@ -177,7 +182,7 @@ class TutoState extends State<TutoPage> {
                         );
                       },
                       child: Text(
-                        'Got it !',
+                        getTranslated(context, 'got_it')!,
                         style:
                             TextStyle(fontSize: 20.0, color: Color(0xffa456a7)),
                       ),
@@ -191,14 +196,11 @@ class TutoState extends State<TutoPage> {
       ),
     ];
 
-    //add
     _controller.addListener(() {
       setState(() {
         _currentPage = _controller.page;
       });
     });
-
-    super.initState();
   }
 
   @override

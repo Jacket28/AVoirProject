@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
@@ -42,6 +44,7 @@ class FeedbackState extends State<FeedbackPage> {
   );
 
   Future<void> send() async {
+    print('send');
     if (attachments.isEmpty) {
       final MailOptions mailOptions = MailOptions(
         body: _bodyController.text,
@@ -50,27 +53,28 @@ class FeedbackState extends State<FeedbackPage> {
         isHTML: true,
       );
       final MailerResponse response = await FlutterMailer.send(mailOptions);
+      print('response');
       switch (response) {
         case MailerResponse.saved:
 
           /// ios only
-          platformResponse = 'mail was saved to draft';
+          platformResponse = getTranslated(context, 'saved_to_draft')!;
           break;
         case MailerResponse.sent:
 
           /// ios only
-          platformResponse = 'mail was sent';
+          platformResponse = getTranslated(context, 'mail_was_sent')!;
           break;
         case MailerResponse.cancelled:
 
           /// ios only
-          platformResponse = 'mail was cancelled';
+          platformResponse = getTranslated(context, 'mail_was_cancelled')!;
           break;
         case MailerResponse.android:
-          platformResponse = 'intent was successful';
+          platformResponse = getTranslated(context, 'intent_was_success')!;
           break;
         default:
-          platformResponse = 'unknown';
+          platformResponse = getTranslated(context, 'unknown')!;
           break;
       }
     } else {
@@ -85,23 +89,23 @@ class FeedbackState extends State<FeedbackPage> {
         case MailerResponse.saved:
 
           /// ios only
-          platformResponse = 'mail was saved to draft';
+          platformResponse = getTranslated(context, 'saved_to_draft')!;
           break;
         case MailerResponse.sent:
 
           /// ios only
-          platformResponse = 'mail was sent';
+          platformResponse = getTranslated(context, 'mail_was_sent')!;
           break;
         case MailerResponse.cancelled:
 
           /// ios only
-          platformResponse = 'mail was cancelled';
+          platformResponse = getTranslated(context, 'mail_was_cancelled')!;
           break;
         case MailerResponse.android:
-          platformResponse = 'intent was successful';
+          platformResponse = getTranslated(context, 'intent_was_success')!;
           break;
         default:
-          platformResponse = 'unknown';
+          platformResponse = getTranslated(context, 'unknown')!;
           break;
       }
     }
@@ -124,7 +128,7 @@ class FeedbackState extends State<FeedbackPage> {
             Container(
               padding: EdgeInsets.only(top: 70, bottom: 20),
               child: Text(
-                'Title',
+                getTranslated(context, 'title')!,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 20.0,
@@ -140,7 +144,7 @@ class FeedbackState extends State<FeedbackPage> {
                 validator: (value) {
                   //handle errors with Password submission
                   if (value == null || value.isEmpty) {
-                    return "Please enter a title";
+                    return getTranslated(context, 'enter_a_title')!;
                   }
                   return null;
                 },
@@ -165,7 +169,7 @@ class FeedbackState extends State<FeedbackPage> {
             Container(
               padding: EdgeInsets.only(top: 20, bottom: 20),
               child: Text(
-                'Description',
+                getTranslated(context, 'description')!,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 20.0,
@@ -180,7 +184,7 @@ class FeedbackState extends State<FeedbackPage> {
                 validator: (value) {
                   //handle errors with Password submission
                   if (value == null || value.isEmpty) {
-                    return "Please enter a description";
+                    return getTranslated(context, 'enter_a_description')!;
                   }
                   return null;
                 },
@@ -207,7 +211,7 @@ class FeedbackState extends State<FeedbackPage> {
             Container(
               padding: EdgeInsets.only(top: 50, bottom: 20),
               child: Text(
-                'Attach a screenshot \n (optional)',
+                getTranslated(context, 'screenshot')!,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                     fontSize: 20.0,
@@ -227,12 +231,14 @@ class FeedbackState extends State<FeedbackPage> {
                         Expanded(
                             flex: 0,
                             child: Container(
-                              margin: EdgeInsets.all(10),
-                              width: 100,
-                              height: 100,
-                              child: Image.file(File(attachments[i]),
-                                  fit: BoxFit.cover),
-                            )),
+                                margin: EdgeInsets.all(10),
+                                width: 100,
+                                height: 100,
+                                child: kIsWeb
+                                    ? Image.network(attachments[i],
+                                        fit: BoxFit.fill)
+                                    : Image.file(File(attachments[i]),
+                                        fit: BoxFit.fill))),
                         IconButton(
                           icon: Icon(Icons.remove_circle),
                           onPressed: () => {_removeAttachment(i)},
@@ -259,7 +265,7 @@ class FeedbackState extends State<FeedbackPage> {
                 child: Center(
                   child: RoundedLoadingButton(
                     color: Color(0xffa456a7),
-                    child: Text('Submit',
+                    child: Text(getTranslated(context, 'submit_btn')!,
                         style: TextStyle(color: Colors.white, fontSize: 18)),
                     controller: _btnController,
                     onPressed: () {
@@ -272,7 +278,8 @@ class FeedbackState extends State<FeedbackPage> {
                               content: new Row(
                                 children: [
                                   new CircularProgressIndicator(),
-                                  new Text("   Redirecting...")
+                                  new Text(
+                                      getTranslated(context, 'redirecting')!)
                                 ],
                               )),
                         );
@@ -315,9 +322,9 @@ class FeedbackState extends State<FeedbackPage> {
       }
     } else {
       AlertDialog alert = AlertDialog(
-        title: Text("Number of screenshots excedeed"),
+        title: Text(getTranslated(context, 'nb_of_screenshot_excedeed')!),
         content: Text(
-          "You cannot add more screenshots. Please delete the screenshot and choose another one.",
+          getTranslated(context, 'nb_of_screenshot_excedeed_message')!,
           style: TextStyle(color: Color(0xffa456a7)),
         ),
         actions: [

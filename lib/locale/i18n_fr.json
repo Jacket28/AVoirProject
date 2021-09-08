@@ -1,0 +1,16 @@
+{
+    "title": "titre",
+    "description": "description",
+    "address": "addresse",
+    "npa": "npa",
+    "city": "ville",
+    "date": "date",
+    "time": "heure",
+    "provider": "prestataire",
+    "attendees": "participants",
+    "url": "url",
+    "dateTime": "date",
+    "selectedDate": "date choisie",
+    "user": "utilisateur",
+    "language": "lang"
+}

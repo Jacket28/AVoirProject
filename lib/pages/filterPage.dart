@@ -1,3 +1,4 @@
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 
@@ -62,7 +63,7 @@ class FilterState extends State<FilterPage> {
                         Padding(padding: EdgeInsets.only(top: 60, left: 65)),
                         Text(
                           //Date section
-                          "Date",
+                          getTranslated(context, 'date')!,
                           style: TextStyle(color: Colors.white, fontSize: 20),
                         ),
                         Padding(padding: EdgeInsets.only(top: 20, left: 145)),
@@ -108,7 +109,7 @@ class FilterState extends State<FilterPage> {
                       ),
                       Text(
                         //Location section
-                        "City",
+                        getTranslated(context, 'city')!,
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                       Container(
@@ -156,7 +157,7 @@ class FilterState extends State<FilterPage> {
                       ),
                       Text(
                         //Description of the events section
-                        "Provider",
+                        getTranslated(context, 'provider')!,
                         style: TextStyle(color: Colors.white, fontSize: 20),
                       ),
                       Padding(
@@ -228,7 +229,7 @@ class FilterState extends State<FilterPage> {
                                 Container(
                                     padding: EdgeInsets.only(left: 5),
                                     child: new Text(
-                                      'Filter',
+                                      getTranslated(context, 'filter')!,
                                       style: TextStyle(
                                           color: Color(0xffa456a7),
                                           fontSize: 20.0),

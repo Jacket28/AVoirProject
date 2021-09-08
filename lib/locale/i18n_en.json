@@ -1,0 +1,16 @@
+{
+    "title": "title",
+    "description": "description",
+    "address": "address",
+    "npa": "npa",
+    "city": "city",
+    "date": "date",
+    "time": "time",
+    "provider": "provider",
+    "attendees": "attendees",
+    "url": "url",
+    "dateTime": "dateTime",
+    "selectedDate": "selected date",
+    "user": "user",
+    "language": "language"
+}

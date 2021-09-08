@@ -13,10 +13,14 @@ class TutoState extends State<TutoPage> {
   final PageController _controller = PageController(initialPage: 0);
   double? _currentPage = 0;
 
-  final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
-
   @override
   void initState() {
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
     _pages = [
       Container(
         color: Color(0xffa456a7),
@@ -192,14 +196,11 @@ class TutoState extends State<TutoPage> {
       ),
     ];
 
-    //add
     _controller.addListener(() {
       setState(() {
         _currentPage = _controller.page;
       });
     });
-
-    super.initState();
   }
 
   @override

@@ -1,5 +1,3 @@
-import 'package:a_voir_app/localization/language_constants.dart';
-
 class Language {
   final int id;
   final String name;

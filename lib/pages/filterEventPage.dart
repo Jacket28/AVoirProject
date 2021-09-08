@@ -8,7 +8,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 
 //This class is used to display all the events that are in the DB.
 class FilterEventPage extends StatefulWidget {
@@ -63,7 +62,7 @@ class _FilterEventState extends State<FilterEventPage> {
                         TextButton(
                           child: Container(
                             height: 50,
-                            width: 140,
+                            width: 200,
                             decoration: BoxDecoration(
                               shape: BoxShape.rectangle,
                               color: Colors.white,
@@ -141,18 +140,31 @@ class _FilterEventState extends State<FilterEventPage> {
           .get();
       events = events.where('provider', isEqualTo: users.docs.first.id);
 
-      listofEvents.add(Container(
-          padding: EdgeInsets.only(top: 20),
-          child: new Text('$provider has created these events : ',
-              style: TextStyle(color: Colors.white, fontSize: 20.0))));
+      String text =
+          '$provider ' + getTranslated(context, 'created_event').toString();
+
+      listofEvents.add(Row(children: [
+        Expanded(
+            child: Container(
+                padding: EdgeInsets.only(top: 20, left: 50, right: 50),
+                child: new Text(text,
+                    style: TextStyle(color: Colors.white, fontSize: 20.0))))
+      ]));
     }
 
     if (user != "") {
       events = events.where('attendees', arrayContains: user);
-      listofEvents.add(Container(
-          padding: EdgeInsets.only(top: 20),
-          child: new Text('$user is participating to these events : ',
-              style: TextStyle(color: Colors.white, fontSize: 20.0))));
+      String text =
+          '$user ' + getTranslated(context, 'participating_event').toString();
+
+      listofEvents.add(Row(children: [
+        Expanded(
+            child: Container(
+          padding: EdgeInsets.only(top: 20, left: 50, right: 50),
+          child: new Text(text,
+              style: TextStyle(color: Colors.white, fontSize: 20.0)),
+        ))
+      ]));
     }
 
     //await is necessary to wait for the asynchronous call.

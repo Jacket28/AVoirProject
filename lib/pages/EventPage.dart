@@ -60,7 +60,7 @@ class EventState extends State<EventPage> {
     final String text =
         "Look I'm attending the event : ${myevents.title} on ${myevents.date} with ${myevents.attendees}";
     RenderBox box = context.findRenderObject() as RenderBox;
-    Share.share(text,
+    Share.share(text.replaceAll('[', '').replaceAll(']', ''),
         subject: "Event : ${myevents.title}",
         sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
   }
@@ -133,7 +133,6 @@ class EventState extends State<EventPage> {
         //this condition is used to handle errors
         if (snapshot.connectionState == ConnectionState.done) {
           if (snapshot.hasData) {
-            print('has data');
             return new Column(children: <Widget>[
               Row(
                 children: <Widget>[
@@ -335,6 +334,7 @@ class EventState extends State<EventPage> {
                     }
                     return new Column(children: <Widget>[snapshot.data!]);
                   }),
+              Padding(padding: EdgeInsets.only(top: 30)),
               _addParticipateButton(context)
             ]);
           }
@@ -358,7 +358,6 @@ class EventState extends State<EventPage> {
     final Map<String, Object?>? document = event.data();
     myEvent = MyEvent.fromJson(document!);
     myEvent.id = eventId;
-    print(myEvent.provider);
 
     final DocumentSnapshot<Map<String, Object?>> user = await FirebaseFirestore
         .instance

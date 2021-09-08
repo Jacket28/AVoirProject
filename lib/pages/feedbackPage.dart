@@ -6,6 +6,7 @@ import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
@@ -43,6 +44,7 @@ class FeedbackState extends State<FeedbackPage> {
   );
 
   Future<void> send() async {
+    print('send');
     if (attachments.isEmpty) {
       final MailOptions mailOptions = MailOptions(
         body: _bodyController.text,
@@ -51,6 +53,7 @@ class FeedbackState extends State<FeedbackPage> {
         isHTML: true,
       );
       final MailerResponse response = await FlutterMailer.send(mailOptions);
+      print('response');
       switch (response) {
         case MailerResponse.saved:
 
@@ -228,12 +231,14 @@ class FeedbackState extends State<FeedbackPage> {
                         Expanded(
                             flex: 0,
                             child: Container(
-                              margin: EdgeInsets.all(10),
-                              width: 100,
-                              height: 100,
-                              child: Image.file(File(attachments[i]),
-                                  fit: BoxFit.cover),
-                            )),
+                                margin: EdgeInsets.all(10),
+                                width: 100,
+                                height: 100,
+                                child: kIsWeb
+                                    ? Image.network(attachments[i],
+                                        fit: BoxFit.fill)
+                                    : Image.file(File(attachments[i]),
+                                        fit: BoxFit.fill))),
                         IconButton(
                           icon: Icon(Icons.remove_circle),
                           onPressed: () => {_removeAttachment(i)},

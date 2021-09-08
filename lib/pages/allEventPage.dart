@@ -73,11 +73,7 @@ class _AllEventState extends State<AllEventPage> {
 
 //This method is used to build the interface of the page based uppon the gotten events from the DB.
   Future<List<Widget>> _getEvent(BuildContext context) async {
-    final events = FirebaseFirestore.instance.collection(
-            "events") /*.where('date',
-        isGreaterThanOrEqualTo:
-            DateFormat.yMd().format(DateTime.now()).toString())*/
-        ;
+    final events = FirebaseFirestore.instance.collection("events");
     //we store all the events into this List.
     List<Widget> listofEvents = [];
 
@@ -189,7 +185,6 @@ class _AllEventState extends State<AllEventPage> {
     int day = int.parse(DateFormat.d().format(DateTime.now()));
 
     if (int.parse(dateSplited[2]) > year) {
-      print('year is superior');
       return true;
     }
 

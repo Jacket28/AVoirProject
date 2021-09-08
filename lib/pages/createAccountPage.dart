@@ -11,6 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loader_overlay/loader_overlay.dart';
@@ -33,6 +34,7 @@ class CreateAccountState extends State<CreateAccountPage> {
     url: "",
   );
   String url = "";
+  var _imageForAPI;
 
   bool _validPassword = false;
 
@@ -50,7 +52,7 @@ class CreateAccountState extends State<CreateAccountPage> {
   var password = "";
   var username = "";
 
-  File? _pickedImage;
+  String _pickedImage = "";
 
   bool _isCreationAccountCorrect = true;
 
@@ -94,19 +96,23 @@ class CreateAccountState extends State<CreateAccountPage> {
                                   _pickImageGallery();
                                 },
                                 child: Container(
-                                    height: 200,
-                                    width: 200,
-                                    decoration: _pickedImage != null
-                                        ? BoxDecoration(
-                                            image: DecorationImage(
-                                                image:
-                                                    FileImage(_pickedImage!)),
-                                          )
-                                        : BoxDecoration(
-                                            image: DecorationImage(
-                                                image: ExactAssetImage(
-                                                    "assets/images/camera.png")),
-                                          ))),
+                                  height: 200,
+                                  width: 200,
+                                  child: _pickedImage != ""
+                                      ? kIsWeb
+                                          ? Image.network(
+                                              _pickedImage,
+                                              fit: BoxFit.fill,
+                                            )
+                                          : Image.file(File(
+                                              _pickedImage,
+                                            ))
+                                      : Icon(
+                                          Icons.photo,
+                                          color: Colors.white,
+                                          size: 100,
+                                        ),
+                                )),
                             Padding(
                               //padding: const EdgeInsets.only(left:15.0,right: 15.0,top:0,bottom: 0),
                               padding: EdgeInsets.symmetric(
@@ -333,7 +339,7 @@ class CreateAccountState extends State<CreateAccountPage> {
                                       controller: _btnController,
                                       onPressed: () async {
                                         if (_formkey.currentState!.validate() &&
-                                            _pickedImage != null) {
+                                            _pickedImage != "") {
                                           if (serviceProvider == false) {
                                             AlertDialog alert = AlertDialog(
                                               title: Text(getTranslated(
@@ -454,9 +460,15 @@ class CreateAccountState extends State<CreateAccountPage> {
     try {
       final picker = ImagePicker();
       final pickedImage = await picker.getImage(source: ImageSource.gallery);
-      final pickedImageFile = File(pickedImage!.path);
+      final pickedImageFile = pickedImage!.path;
+      final imageForApi;
+      if (kIsWeb)
+        imageForApi = await pickedImage.readAsBytes();
+      else
+        imageForApi = 0;
       setState(() {
         _pickedImage = pickedImageFile;
+        _imageForAPI = imageForApi;
       });
     } on TypeError catch (exception) {
       Navigator.of(context).pop();
@@ -490,7 +502,12 @@ class CreateAccountState extends State<CreateAccountPage> {
         .ref()
         .child("userImages")
         .child(_myUser.username + ".jpg");
-    await ref.putFile(_pickedImage!);
+
+    if (kIsWeb)
+      await ref.putData(_imageForAPI);
+    else
+      await ref.putFile(File(_pickedImage));
+
     url = await ref.getDownloadURL();
 
     return url;

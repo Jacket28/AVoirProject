@@ -1,13 +1,11 @@
 import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/main.dart';
 import 'package:a_voir_app/models/language.dart';
-import 'package:a_voir_app/translations.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'dart:developer' as developer;
 import 'feedbackPage.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -52,37 +50,10 @@ class SettingsState extends State<SettingsPage> {
                       0xffffffff,
                     )),
               ),
-              //     Text(
-              //   'Language : ',
-              //   textAlign: TextAlign.center,
-              //   style: TextStyle(
-              //       fontSize: 20.0,
-              //       color: Color(
-              //         0xffffffff,
-              //       )),
-              // ),
             )),
             Padding(
               padding: EdgeInsets.symmetric(vertical: 10),
             ),
-
-            // Container(
-            //   padding: EdgeInsets.symmetric(horizontal: 20),
-            //   decoration: BoxDecoration(
-            //     borderRadius: BorderRadius.circular(25),
-            //     color: Colors.white,
-            //   ),
-            //   width: 132,
-            //   child: TextButton(
-            //     child: const Text(
-            //       'Change lang',
-            //       style: TextStyle(color: Color(0xffa456a7)),
-            //     ),
-            //     onPressed: () {
-            //       _changeLanguage(Language.languageList()[1]);
-            //     },
-            //   ),
-            // ),
             Container(
               padding: EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(

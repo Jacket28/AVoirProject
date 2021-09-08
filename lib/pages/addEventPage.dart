@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/models/MyEvent.dart';
@@ -53,6 +54,7 @@ class AddEventState extends State<AddEventPage> {
   bool isEditing = false;
 
   String _pickedImage = "";
+  var _imageForAPI;
 
   String url = "";
 
@@ -377,8 +379,11 @@ class AddEventState extends State<AddEventPage> {
                                     height: 150,
                                     width: 200,
                                     child: _pickedImage != ""
-                                        ? Image.network(_pickedImage,
-                                            fit: BoxFit.fill)
+                                        ? kIsWeb
+                                            ? Image.network(_pickedImage,
+                                                fit: BoxFit.fill)
+                                            : Image.file(File(_pickedImage),
+                                                fit: BoxFit.fill)
                                         : Icon(
                                             Icons.photo,
                                             color: Color(0xff643165),
@@ -397,7 +402,7 @@ class AddEventState extends State<AddEventPage> {
                               TextButton(
                                 child: Container(
                                   height: 50,
-                                  width: 130,
+                                  width: 160,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.rectangle,
                                     color: Colors.white,
@@ -465,8 +470,14 @@ class AddEventState extends State<AddEventPage> {
       final picker = ImagePicker();
       final pickedImage = await picker.getImage(source: ImageSource.gallery);
       final pickedImageFile = pickedImage!.path;
+      final imageForApi;
+      if (kIsWeb)
+        imageForApi = await pickedImage.readAsBytes();
+      else
+        imageForApi = null;
       setState(() {
         _pickedImage = pickedImageFile;
+        _imageForAPI = imageForApi;
       });
     } on TypeError catch (exception) {
       Navigator.of(context).pop();
@@ -504,7 +515,12 @@ class AddEventState extends State<AddEventPage> {
         .ref()
         .child("eventImages")
         .child(_myEvent.title + ".jpg");
-    await ref.putFile(File(_pickedImage));
+
+    if (kIsWeb)
+      await ref.putData(_imageForAPI);
+    else
+      await ref.putFile(File(_pickedImage));
+
     url = await ref.getDownloadURL();
 
     return url;

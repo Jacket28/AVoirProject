@@ -96,5 +96,7 @@
   "settings": "Settings",
   "subscription": "Subscription",
   "about": "About",
-  "log_out": "Log out"
+  "log_out": "Log out",
+  "created_event" : "has created these events : ",
+  "participating_event" : "is participating to these events : "
 }

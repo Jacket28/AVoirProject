@@ -53,10 +53,6 @@ class AboutState extends State<AboutPage> {
                   getTranslated(context, 'application_resume')!,
                   style: TextStyle(color: Colors.white, fontSize: 20),
                 ),
-                /*child: Text(
-                  "This application has been created as part of the module 645-2 at the University of Applied Sciences Western Switzerland.",
-                  style: TextStyle(color: Colors.white, fontSize: 20),
-                ),*/
               ),
               Padding(
                 padding: EdgeInsets.only(top: 20),

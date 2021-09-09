@@ -177,7 +177,6 @@ class LoginPageState extends State<LoginPage> {
                                   password = _passwordController.text;
 
                                   // If the form is valid, display a snackbar.
-
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     new SnackBar(
                                         duration: new Duration(seconds: 1),
@@ -309,5 +308,3 @@ Future<void> _setreferences(BuildContext context, String email) async {
     prefs.setBool('isProvider', value.docs.single.get('isServiceProvider'));
   });
 }
-
-class HomePage {}

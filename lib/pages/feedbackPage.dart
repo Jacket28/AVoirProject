@@ -49,7 +49,7 @@ class FeedbackState extends State<FeedbackPage> {
       final MailOptions mailOptions = MailOptions(
         body: _bodyController.text,
         subject: _subjectController.text,
-        recipients: ['kevin.coppey28@hotmail.com'],
+        recipients: [_recipientController.text],
         isHTML: true,
       );
       final MailerResponse response = await FlutterMailer.send(mailOptions);
@@ -81,7 +81,7 @@ class FeedbackState extends State<FeedbackPage> {
       final MailOptions mailOptions = MailOptions(
           body: _bodyController.text,
           subject: _subjectController.text,
-          recipients: ['kevin.coppey28@hotmail.com'],
+          recipients: [_recipientController.text],
           isHTML: true,
           attachments: [attachments[0]]);
       final MailerResponse response = await FlutterMailer.send(mailOptions);

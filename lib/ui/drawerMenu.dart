@@ -243,7 +243,6 @@ class DrawerMenu extends StatelessWidget implements PreferredSizeWidget {
       Map<String, dynamic>? data = docSnapshot.data();
 
       // You can then retrieve the value from the Map like this:
-
       username = data?['username'];
     }
     return username;

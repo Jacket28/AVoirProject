@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/models/MyEvent.dart';
@@ -379,7 +378,7 @@ class AddEventState extends State<AddEventPage> {
                                     height: 150,
                                     width: 200,
                                     child: _pickedImage != ""
-                                        ? _myEvent.hasId()
+                                        ? isEditing
                                             ? Image.network(_pickedImage,
                                                 fit: BoxFit.fill)
                                             : kIsWeb

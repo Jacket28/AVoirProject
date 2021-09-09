@@ -34,7 +34,6 @@ class CreateAccountState extends State<CreateAccountPage> {
     url: "",
   );
   String url = "";
-  var _imageForAPI;
 
   bool _validPassword = false;
 
@@ -53,6 +52,7 @@ class CreateAccountState extends State<CreateAccountPage> {
   var username = "";
 
   String _pickedImage = "";
+  var _imageForAPI;
 
   bool _isCreationAccountCorrect = true;
 
@@ -532,19 +532,55 @@ class CreateAccountState extends State<CreateAccountPage> {
   }
 
   registration() async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
-      CollectionReference userRefs = FirebaseFirestore.instance
-          .collection('users')
-          .withConverter<MyUser>(
-            fromFirestore: (snapshot, _) => MyUser.fromJson(snapshot.data()!),
-            toFirestore: (user, _) => user.toJson(),
-          );
+    if (await _isUsernameValid(_myUser.user_username)) {
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(email: email, password: password);
+        CollectionReference userRefs = FirebaseFirestore.instance
+            .collection('users')
+            .withConverter<MyUser>(
+              fromFirestore: (snapshot, _) => MyUser.fromJson(snapshot.data()!),
+              toFirestore: (user, _) => user.toJson(),
+            );
 
-      uid = userCredential.user!.uid;
-      _addUserToDatabase(context, userRefs);
-    } on FirebaseAuthException catch (e) {
+        uid = userCredential.user!.uid;
+        _addUserToDatabase(context, userRefs);
+      } on FirebaseAuthException catch (e) {
+        _buttonFail();
+        _buttonReset();
+        _isCreationAccountCorrect = false;
+        showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+                title: Text(getTranslated(context, 'creation_account_failed')!),
+                content: Text('${e.message}')));
+      }
+      if (_isCreationAccountCorrect == true) {
+        _myUser.isServiceProvider = serviceProvider;
+        ScaffoldMessenger.of(context).showSnackBar(
+          new SnackBar(
+              duration: new Duration(seconds: 1),
+              content: new Row(
+                children: [
+                  new CircularProgressIndicator(),
+                  new Text(
+                    getTranslated(context, 'creating_your_account')!,
+                  )
+                ],
+              )),
+        );
+        context.loaderOverlay.show();
+        _buttonSuccess();
+        _buttonReset();
+        Timer(Duration(seconds: 1), () {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => TutoPage()),
+              ModalRoute.withName(Navigator.defaultRouteName));
+        });
+        context.loaderOverlay.hide();
+      }
+    } else {
       _buttonFail();
       _buttonReset();
       _isCreationAccountCorrect = false;
@@ -552,37 +588,25 @@ class CreateAccountState extends State<CreateAccountPage> {
           context: context,
           builder: (ctx) => AlertDialog(
               title: Text(getTranslated(context, 'creation_account_failed')!),
-              content: Text('${e.message}')));
-    }
-    if (_isCreationAccountCorrect == true) {
-      _myUser.isServiceProvider = serviceProvider;
-      ScaffoldMessenger.of(context).showSnackBar(
-        new SnackBar(
-            duration: new Duration(seconds: 1),
-            content: new Row(
-              children: [
-                new CircularProgressIndicator(),
-                new Text(
-                  getTranslated(context, 'creating_your_account')!,
-                )
-              ],
-            )),
-      );
-      context.loaderOverlay.show();
-      _buttonSuccess();
-      _buttonReset();
-      Timer(Duration(seconds: 1), () {
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => TutoPage()),
-            ModalRoute.withName(Navigator.defaultRouteName));
-      });
-      context.loaderOverlay.hide();
+              content: Text(getTranslated(context, 'usernameTaken')!)));
     }
   }
 
   Future<Null> _addUserToDatabase(
       BuildContext context, CollectionReference userRefs) async {
     await userRefs.doc(uid).set(_myUser);
+  }
+
+  Future<bool> _isUsernameValid(String username) async {
+    FirebaseFirestore.instance
+        .collection("users")
+        .where('username', isEqualTo: username)
+        .get()
+        .then((querysnapshot) {
+      if (querysnapshot.size == 0) {
+        return true;
+      }
+    });
+    return false;
   }
 }

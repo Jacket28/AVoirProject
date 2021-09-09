@@ -338,10 +338,8 @@ class EventState extends State<EventPage> {
               _addParticipateButton(context)
             ]);
           }
-
           return CircularProgressIndicator();
         }
-
         return DotsIndicator(dotsCount: 3);
       },
     ));
@@ -366,6 +364,7 @@ class EventState extends State<EventPage> {
         .get();
 
     this.user = user.data()!['username'] as String;
+
     return myEvent;
   }
 

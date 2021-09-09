@@ -1,7 +1,9 @@
 import 'dart:async';
 
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/pages/createAccountPage.dart';
+import 'package:a_voir_app/pages/settingsPage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -9,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:rounded_loading_button/rounded_loading_button.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'aboutPage.dart';
 
 class LoginPage extends StatefulWidget {
   @override
@@ -42,11 +46,27 @@ class LoginPageState extends State<LoginPage> {
             backgroundColor: Color(0xff643165),
             toolbarHeight: 70,
             elevation: 0,
+            title: IconButton(
+              icon: const Icon(Icons.info_outline),
+              iconSize: 40,
+              padding: EdgeInsets.only(left: 0),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => AboutPage()),
+                );
+              },
+            ),
             actions: <Widget>[
               IconButton(
                 icon: const Icon(Icons.settings),
                 iconSize: 40,
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SettingsPage()),
+                  );
+                },
               ),
             ],
           ),
@@ -77,10 +97,10 @@ class LoginPageState extends State<LoginPage> {
                             validator: (value) {
                               //handle errors with email submission
                               if (value == null || value.isEmpty) {
-                                return "Please enter your Email";
+                                return getTranslated(context, 'enter_mail')!;
                               }
                               if (!value.contains("@"))
-                                return "Please enter a valid Email";
+                                return getTranslated(context, 'valid_mail')!;
                             },
                             style: TextStyle(color: Colors.white),
                             decoration: InputDecoration(
@@ -95,10 +115,10 @@ class LoginPageState extends State<LoginPage> {
                                   borderRadius: new BorderRadius.circular(25.0),
                                   borderSide: BorderSide(color: Colors.white),
                                 ),
-                                labelText: 'Email',
+                                labelText: getTranslated(context, 'email')!,
                                 labelStyle: TextStyle(color: Colors.grey),
                                 hintText:
-                                    'Enter a valid email as abc@gmail.com'),
+                                    getTranslated(context, 'valid_mail_as')!),
                           ),
                         ),
                         Container(
@@ -110,7 +130,8 @@ class LoginPageState extends State<LoginPage> {
                             validator: (value) {
                               //handle errors with Password submission
                               if (value == null || value.isEmpty) {
-                                return "Please enter your Password";
+                                return getTranslated(
+                                    context, 'please_enter_password')!;
                               }
                               return null;
                             },
@@ -128,9 +149,10 @@ class LoginPageState extends State<LoginPage> {
                                   borderRadius: new BorderRadius.circular(25.0),
                                   borderSide: BorderSide(color: Colors.white),
                                 ),
-                                labelText: 'Password',
+                                labelText: getTranslated(context, 'password')!,
                                 labelStyle: TextStyle(color: Colors.grey),
-                                hintText: 'Enter your password'),
+                                hintText:
+                                    getTranslated(context, 'enter_password')!),
                           ),
                         ),
                         Container(
@@ -139,7 +161,7 @@ class LoginPageState extends State<LoginPage> {
                           child: Center(
                             child: RoundedLoadingButton(
                               color: Color(0xffa456a7),
-                              child: Text('Log In',
+                              child: Text(getTranslated(context, 'login')!,
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 18)),
                               controller: _btnController,
@@ -155,14 +177,14 @@ class LoginPageState extends State<LoginPage> {
                                   password = _passwordController.text;
 
                                   // If the form is valid, display a snackbar.
-
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     new SnackBar(
                                         duration: new Duration(seconds: 1),
                                         content: new Row(
                                           children: [
                                             new CircularProgressIndicator(),
-                                            new Text("   Signin in...")
+                                            new Text(getTranslated(
+                                                context, 'Signin_in')!)
                                           ],
                                         )),
                                   );
@@ -182,7 +204,7 @@ class LoginPageState extends State<LoginPage> {
                   height: 30,
                 ),
                 Text(
-                  "New user ?",
+                  getTranslated(context, "new_user")!,
                   style: TextStyle(fontSize: 20, color: Colors.white),
                 ),
                 Column(
@@ -204,7 +226,7 @@ class LoginPageState extends State<LoginPage> {
                           }
                         });
                       },
-                      child: Text('Create account',
+                      child: Text(getTranslated(context, 'createaccount')!,
                           style: TextStyle(
                               decoration: TextDecoration.underline,
                               fontSize: 20.0,
@@ -255,7 +277,8 @@ class LoginPageState extends State<LoginPage> {
       showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-              title: Text("Ops! Login Failed"), content: Text('${e.message}')));
+              title: Text(getTranslated(context, 'login_failed')!),
+              content: Text('${e.message}')));
     }
     if (_isLoginCorrect == true) {
       _setreferences(context, mail);
@@ -285,5 +308,3 @@ Future<void> _setreferences(BuildContext context, String email) async {
     prefs.setBool('isProvider', value.docs.single.get('isServiceProvider'));
   });
 }
-
-class HomePage {}

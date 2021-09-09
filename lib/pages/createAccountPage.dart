@@ -2,13 +2,16 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/models/MyUser.dart';
 import 'package:a_voir_app/pages/loginPage.dart';
+import 'package:a_voir_app/pages/tutoPage.dart';
 import 'package:a_voir_app/ui/myTooltip.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:loader_overlay/loader_overlay.dart';
@@ -48,7 +51,8 @@ class CreateAccountState extends State<CreateAccountPage> {
   var password = "";
   var username = "";
 
-  File? _pickedImage;
+  String _pickedImage = "";
+  var _imageForAPI;
 
   bool _isCreationAccountCorrect = true;
 
@@ -77,7 +81,7 @@ class CreateAccountState extends State<CreateAccountPage> {
                           const EdgeInsets.only(left: 20, top: 80, bottom: 30),
                       child: Center(
                         child: Text(
-                          "It's a pleasure to welcome you !",
+                          getTranslated(context, 'welcome_message')!,
                           style: TextStyle(
                               fontSize: 20.0, color: Color(0xffffffff)),
                         ),
@@ -92,16 +96,22 @@ class CreateAccountState extends State<CreateAccountPage> {
                                   _pickImageGallery();
                                 },
                                 child: Container(
-                                  height: 150,
+                                  height: 200,
                                   width: 200,
-                                  child: _pickedImage != null
-                                      ? Image.file(_pickedImage!,
-                                          fit: BoxFit.fill)
-                                      : Text(''),
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.white,
-                                  ),
+                                  child: _pickedImage != ""
+                                      ? kIsWeb
+                                          ? Image.network(
+                                              _pickedImage,
+                                              fit: BoxFit.fill,
+                                            )
+                                          : Image.file(File(
+                                              _pickedImage,
+                                            ))
+                                      : Icon(
+                                          Icons.photo,
+                                          color: Colors.white,
+                                          size: 100,
+                                        ),
                                 )),
                             Padding(
                               //padding: const EdgeInsets.only(left:15.0,right: 15.0,top:0,bottom: 0),
@@ -112,7 +122,8 @@ class CreateAccountState extends State<CreateAccountPage> {
                                 validator: (value) {
                                   //handle errors with Username submission
                                   if (value == null || value.isEmpty) {
-                                    return "Please enter your Username";
+                                    return getTranslated(
+                                        context, 'username_message')!;
                                   }
                                   _myUser.username = value;
                                 },
@@ -137,9 +148,11 @@ class CreateAccountState extends State<CreateAccountPage> {
                                       borderSide:
                                           BorderSide(color: Colors.white),
                                     ),
-                                    labelText: 'Username',
+                                    labelText:
+                                        getTranslated(context, 'username')!,
                                     labelStyle: TextStyle(color: Colors.grey),
-                                    hintText: 'Username'),
+                                    hintText:
+                                        getTranslated(context, 'username')!),
                               ),
                             ),
                             Padding(
@@ -151,9 +164,11 @@ class CreateAccountState extends State<CreateAccountPage> {
                                 validator: (value) {
                                   //handle errors with Email submission
                                   if (value == null || value.isEmpty) {
-                                    return "Please enter your Mail";
+                                    return getTranslated(
+                                        context, 'enter_mail')!;
                                   } else if (!value.contains("@")) {
-                                    return "Please enter a valid Email";
+                                    return getTranslated(
+                                        context, 'valid_mail')!;
                                   }
                                   _myUser.email = value;
                                 },
@@ -175,9 +190,9 @@ class CreateAccountState extends State<CreateAccountPage> {
                                       borderSide:
                                           BorderSide(color: Colors.white),
                                     ),
-                                    labelText: 'E-mail',
+                                    labelText: getTranslated(context, 'email')!,
                                     labelStyle: TextStyle(color: Colors.grey),
-                                    hintText: 'E-mail'),
+                                    hintText: getTranslated(context, 'email')!),
                               ),
                             ),
                             _validPassword
@@ -215,9 +230,11 @@ class CreateAccountState extends State<CreateAccountPage> {
                                         borderSide:
                                             BorderSide(color: Colors.white),
                                       ),
-                                      labelText: 'Password',
+                                      labelText:
+                                          getTranslated(context, 'password')!,
                                       labelStyle: TextStyle(color: Colors.grey),
-                                      hintText: 'Password'),
+                                      hintText:
+                                          getTranslated(context, 'password')!),
                                 )),
                             Padding(
                               //padding: const EdgeInsets.only(left:15.0,right: 15.0,top:0,bottom: 0),
@@ -228,10 +245,12 @@ class CreateAccountState extends State<CreateAccountPage> {
                                 validator: (value) {
                                   //handle errors with Password submission
                                   if (value == null || value.isEmpty) {
-                                    return "Please verify your Password";
+                                    return getTranslated(
+                                        context, 'please_verify_password')!;
                                   } else if (value !=
                                       _passwordController.text) {
-                                    return "Your passwords must be identical !";
+                                    return getTranslated(
+                                        context, 'identical_password')!;
                                   }
                                   var bytes = utf8.encode(value);
                                   var digest = sha512.convert(bytes);
@@ -259,9 +278,11 @@ class CreateAccountState extends State<CreateAccountPage> {
                                       borderSide:
                                           BorderSide(color: Colors.white),
                                     ),
-                                    labelText: 'Verify your password',
+                                    labelText: getTranslated(
+                                        context, 'verify_password')!,
                                     labelStyle: TextStyle(color: Colors.grey),
-                                    hintText: 'Password'),
+                                    hintText:
+                                        getTranslated(context, 'password')!),
                               ),
                             ),
                             Padding(
@@ -271,11 +292,13 @@ class CreateAccountState extends State<CreateAccountPage> {
                                 padding: EdgeInsets.only(left: 80),
                                 child: Row(
                                   children: [
-                                    Text("Service Provider Account ?   ",
+                                    Text(
+                                        getTranslated(
+                                            context, 'service_provider')!,
                                         style: TextStyle(color: Colors.white)),
                                     MyTooltip(
-                                        message:
-                                            "A service provider account is required \n if you want to add your own events !",
+                                        message: getTranslated(context,
+                                            'service_provider_details')!,
                                         child: Image.asset(
                                           'assets/images/infoTip.png',
                                           height: 15,
@@ -307,39 +330,103 @@ class CreateAccountState extends State<CreateAccountPage> {
                                 child: Center(
                                   child: RoundedLoadingButton(
                                       color: Color(0xffa456a7),
-                                      child: Text('Create your account !',
+                                      child: Text(
+                                          getTranslated(
+                                              context, 'create_your_account')!,
                                           style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 15)),
                                       controller: _btnController,
                                       onPressed: () async {
                                         if (_formkey.currentState!.validate() &&
-                                            _pickedImage != null) {
-                                          _myUser.url =
-                                              await _sendImageToFirebase(
-                                                  context);
-                                          setState(() {
-                                            _isCreationAccountCorrect = true;
-                                          });
-                                          _validPassword = true;
-                                          username = _usernameController.text;
-                                          email = _mailController.text
-                                              .toLowerCase();
-                                          password = _passwordController.text;
-                                          registration();
+                                            _pickedImage != "") {
+                                          if (serviceProvider == false) {
+                                            AlertDialog alert = AlertDialog(
+                                              title: Text(getTranslated(
+                                                  context, 'warning')!),
+                                              content: Text(
+                                                getTranslated(context,
+                                                    'not_service_provider_message')!,
+                                                style: TextStyle(
+                                                    color: Color(0xffa456a7)),
+                                              ),
+                                              actions: [
+                                                TextButton(
+                                                    child: Text(
+                                                        getTranslated(
+                                                            context, 'cancel')!,
+                                                        style: TextStyle(
+                                                            color: Colors.red)),
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                      _buttonReset();
+                                                    }),
+                                                TextButton(
+                                                    child: Text(
+                                                        getTranslated(context,
+                                                            'ok_message')!,
+                                                        style: TextStyle(
+                                                            color: Color(
+                                                                0xffa456a7))),
+                                                    onPressed: () async {
+                                                      _myUser.url =
+                                                          await _sendImageToFirebase(
+                                                              context);
+                                                      setState(() {
+                                                        _isCreationAccountCorrect =
+                                                            true;
+                                                      });
+                                                      _validPassword = true;
+                                                      username =
+                                                          _usernameController
+                                                              .text;
+                                                      email = _mailController
+                                                          .text
+                                                          .toLowerCase();
+                                                      password =
+                                                          _passwordController
+                                                              .text;
+                                                      registration();
+                                                    }),
+                                              ],
+                                            );
+                                            showDialog(
+                                              context: context,
+                                              builder: (BuildContext context) {
+                                                return alert;
+                                              },
+                                            );
+                                          } else {
+                                            _myUser.url =
+                                                await _sendImageToFirebase(
+                                                    context);
+                                            setState(() {
+                                              _isCreationAccountCorrect = true;
+                                            });
+                                            _validPassword = true;
+                                            username = _usernameController.text;
+                                            email = _mailController.text
+                                                .toLowerCase();
+                                            password = _passwordController.text;
+                                            registration();
+                                          }
                                         } else {
                                           _validPassword = false;
 
                                           AlertDialog alert = AlertDialog(
-                                            title: Text("Creating account"),
+                                            title: Text(getTranslated(
+                                                context, 'create_account')!),
                                             content: Text(
-                                              "Check everything as been filled !",
+                                              getTranslated(context,
+                                                  'everything_as_been_filled')!,
                                               style: TextStyle(
                                                   color: Color(0xffa456a7)),
                                             ),
                                             actions: [
                                               TextButton(
-                                                  child: Text("OK",
+                                                  child: Text(
+                                                      getTranslated(context,
+                                                          'ok_message')!,
                                                       style: TextStyle(
                                                           color: Color(
                                                               0xffa456a7))),
@@ -370,12 +457,44 @@ class CreateAccountState extends State<CreateAccountPage> {
   }
 
   void _pickImageGallery() async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.getImage(source: ImageSource.gallery);
-    final pickedImageFile = File(pickedImage!.path);
-    setState(() {
-      _pickedImage = pickedImageFile;
-    });
+    try {
+      final picker = ImagePicker();
+      final pickedImage = await picker.getImage(source: ImageSource.gallery);
+      final pickedImageFile = pickedImage!.path;
+      final imageForApi;
+      if (kIsWeb)
+        imageForApi = await pickedImage.readAsBytes();
+      else
+        imageForApi = 0;
+      setState(() {
+        _pickedImage = pickedImageFile;
+        _imageForAPI = imageForApi;
+      });
+    } on TypeError catch (exception) {
+      Navigator.of(context).pop();
+    } catch (error) {
+      AlertDialog(
+        title: Text(getTranslated(context, 'wrong_message')!),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text(getTranslated(context, 'check_photo_format')!),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: const Text(
+              'OK',
+              style: TextStyle(color: Color(0xffa456a7)),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    }
   }
 
   Future<String> _sendImageToFirebase(BuildContext context) async {
@@ -383,7 +502,12 @@ class CreateAccountState extends State<CreateAccountPage> {
         .ref()
         .child("userImages")
         .child(_myUser.username + ".jpg");
-    await ref.putFile(_pickedImage!);
+
+    if (kIsWeb)
+      await ref.putData(_imageForAPI);
+    else
+      await ref.putFile(File(_pickedImage));
+
     url = await ref.getDownloadURL();
 
     return url;
@@ -408,57 +532,81 @@ class CreateAccountState extends State<CreateAccountPage> {
   }
 
   registration() async {
-    try {
-      UserCredential userCredential = await FirebaseAuth.instance
-          .createUserWithEmailAndPassword(email: email, password: password);
-      CollectionReference userRefs = FirebaseFirestore.instance
-          .collection('users')
-          .withConverter<MyUser>(
-            fromFirestore: (snapshot, _) => MyUser.fromJson(snapshot.data()!),
-            toFirestore: (user, _) => user.toJson(),
-          );
+    if (await _isUsernameValid(_myUser.user_username)) {
+      try {
+        UserCredential userCredential = await FirebaseAuth.instance
+            .createUserWithEmailAndPassword(email: email, password: password);
+        CollectionReference userRefs = FirebaseFirestore.instance
+            .collection('users')
+            .withConverter<MyUser>(
+              fromFirestore: (snapshot, _) => MyUser.fromJson(snapshot.data()!),
+              toFirestore: (user, _) => user.toJson(),
+            );
 
-      uid = userCredential.user!.uid;
-      _addUserToDatabase(context, userRefs);
-    } on FirebaseAuthException catch (e) {
+        uid = userCredential.user!.uid;
+        _addUserToDatabase(context, userRefs);
+      } on FirebaseAuthException catch (e) {
+        _buttonFail();
+        _buttonReset();
+        _isCreationAccountCorrect = false;
+        showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+                title: Text(getTranslated(context, 'creation_account_failed')!),
+                content: Text('${e.message}')));
+      }
+      if (_isCreationAccountCorrect == true) {
+        _myUser.isServiceProvider = serviceProvider;
+        ScaffoldMessenger.of(context).showSnackBar(
+          new SnackBar(
+              duration: new Duration(seconds: 1),
+              content: new Row(
+                children: [
+                  new CircularProgressIndicator(),
+                  new Text(
+                    getTranslated(context, 'creating_your_account')!,
+                  )
+                ],
+              )),
+        );
+        context.loaderOverlay.show();
+        _buttonSuccess();
+        _buttonReset();
+        Timer(Duration(seconds: 1), () {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => TutoPage()),
+              ModalRoute.withName(Navigator.defaultRouteName));
+        });
+        context.loaderOverlay.hide();
+      }
+    } else {
       _buttonFail();
       _buttonReset();
       _isCreationAccountCorrect = false;
       showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-              title: Text("Ops! Creation of Account Failed"),
-              content: Text('${e.message}')));
-    }
-    if (_isCreationAccountCorrect == true) {
-      _myUser.isServiceProvider = serviceProvider;
-      ScaffoldMessenger.of(context).showSnackBar(
-        new SnackBar(
-            duration: new Duration(seconds: 1),
-            content: new Row(
-              children: [
-                new CircularProgressIndicator(),
-                new Text(
-                  "   Creating your account",
-                )
-              ],
-            )),
-      );
-      context.loaderOverlay.show();
-      _buttonSuccess();
-      _buttonReset();
-      Timer(Duration(seconds: 1), () {
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => LoginPage()),
-            ModalRoute.withName(Navigator.defaultRouteName));
-      });
-      context.loaderOverlay.hide();
+              title: Text(getTranslated(context, 'creation_account_failed')!),
+              content: Text(getTranslated(context, 'usernameTaken')!)));
     }
   }
 
   Future<Null> _addUserToDatabase(
       BuildContext context, CollectionReference userRefs) async {
     await userRefs.doc(uid).set(_myUser);
+  }
+
+  Future<bool> _isUsernameValid(String username) async {
+    FirebaseFirestore.instance
+        .collection("users")
+        .where('username', isEqualTo: username)
+        .get()
+        .then((querysnapshot) {
+      if (querysnapshot.size == 0) {
+        return true;
+      }
+    });
+    return false;
   }
 }

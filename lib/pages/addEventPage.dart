@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
@@ -9,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -50,7 +52,8 @@ class AddEventState extends State<AddEventPage> {
   //Used to know if the textField can be edited or not.
   bool isEditing = false;
 
-  File? _pickedImage;
+  String _pickedImage = "";
+  var _imageForAPI;
 
   String url = "";
 
@@ -85,6 +88,7 @@ class AddEventState extends State<AddEventPage> {
       _descriptionController.text = _myEvent.description;
       _dateController.text = _myEvent.date;
       _timeController.text = _myEvent.time;
+      _pickedImage = _myEvent.url;
     }
 
     _setreferences(context).whenComplete(() {
@@ -132,7 +136,7 @@ class AddEventState extends State<AddEventPage> {
                             ),
                             Text(
                               //Title section
-                              "Title",
+                              getTranslated(context, 'title')!,
                               style:
                                   TextStyle(color: Colors.white, fontSize: 20),
                             ),
@@ -144,25 +148,26 @@ class AddEventState extends State<AddEventPage> {
                                     controller: _titleController,
                                     style: TextStyle(color: Colors.white),
                                     decoration: InputDecoration(
-                                        counterStyle:
-                                            TextStyle(color: Colors.white),
-                                        hintStyle:
-                                            TextStyle(color: Colors.grey),
-                                        enabledBorder: new OutlineInputBorder(
-                                          borderRadius:
-                                              new BorderRadius.circular(25.0),
-                                          borderSide:
-                                              BorderSide(color: Colors.white),
-                                        ),
-                                        focusedBorder: new OutlineInputBorder(
-                                          borderRadius:
-                                              new BorderRadius.circular(25.0),
-                                          borderSide:
-                                              BorderSide(color: Colors.white),
-                                        ),
-                                        labelStyle:
-                                            TextStyle(color: Colors.white),
-                                        hintText: 'Subject of Event.'),
+                                      counterStyle:
+                                          TextStyle(color: Colors.white),
+                                      hintStyle: TextStyle(color: Colors.grey),
+                                      enabledBorder: new OutlineInputBorder(
+                                        borderRadius:
+                                            new BorderRadius.circular(25.0),
+                                        borderSide:
+                                            BorderSide(color: Colors.white),
+                                      ),
+                                      focusedBorder: new OutlineInputBorder(
+                                        borderRadius:
+                                            new BorderRadius.circular(25.0),
+                                        borderSide:
+                                            BorderSide(color: Colors.white),
+                                      ),
+                                      labelStyle:
+                                          TextStyle(color: Colors.white),
+                                      hintText: getTranslated(
+                                          context, 'event_subject')!,
+                                    ),
                                     onChanged: (text) {
                                       _myEvent.title = text;
                                     })),
@@ -173,7 +178,7 @@ class AddEventState extends State<AddEventPage> {
                                         EdgeInsets.only(top: 10, left: 65)),
                                 Text(
                                   //Date section
-                                  "Date",
+                                  getTranslated(context, 'date')!,
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 20),
                                 ),
@@ -182,7 +187,7 @@ class AddEventState extends State<AddEventPage> {
                                         EdgeInsets.only(top: 100, left: 145)),
                                 Text(
                                   //time section
-                                  "Time",
+                                  getTranslated(context, 'time')!,
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 20),
                                 ),
@@ -198,27 +203,34 @@ class AddEventState extends State<AddEventPage> {
                                     });
                                   },
                                   child: Container(
-                                    width: 100,
-                                    height: 70,
-                                    alignment: Alignment.center,
-                                    decoration:
-                                        BoxDecoration(color: Colors.white),
-                                    child: TextFormField(
-                                      style: TextStyle(fontSize: 20),
-                                      textAlign: TextAlign.center,
-                                      enabled: false,
-                                      keyboardType: TextInputType.text,
-                                      controller: _dateController,
-                                      decoration: InputDecoration(
-                                          disabledBorder: UnderlineInputBorder(
-                                              borderSide: BorderSide.none),
-                                          contentPadding:
-                                              EdgeInsets.only(top: 0)),
-                                      onChanged: (text) {
-                                        _myEvent.date = text;
-                                      },
-                                    ),
-                                  ),
+                                      width: 100,
+                                      height: 70,
+                                      alignment: Alignment.center,
+                                      decoration:
+                                          BoxDecoration(color: Colors.white),
+                                      child: _dateController.text == ""
+                                          ? Icon(
+                                              Icons.calendar_today,
+                                              color: Color(0xff643165),
+                                              size: 50,
+                                            )
+                                          : TextFormField(
+                                              style: TextStyle(fontSize: 20),
+                                              textAlign: TextAlign.center,
+                                              enabled: false,
+                                              keyboardType: TextInputType.text,
+                                              controller: _dateController,
+                                              decoration: InputDecoration(
+                                                  disabledBorder:
+                                                      UnderlineInputBorder(
+                                                          borderSide:
+                                                              BorderSide.none),
+                                                  contentPadding:
+                                                      EdgeInsets.only(top: 0)),
+                                              onChanged: (text) {
+                                                _myEvent.date = text;
+                                              },
+                                            )),
                                 ),
                                 Padding(padding: EdgeInsets.only(left: 90)),
                                 InkWell(
@@ -232,21 +244,29 @@ class AddEventState extends State<AddEventPage> {
                                     height: 70,
                                     alignment: Alignment.center,
                                     decoration:
-                                        BoxDecoration(color: Colors.grey[200]),
-                                    child: TextFormField(
-                                      style: TextStyle(fontSize: 20),
-                                      textAlign: TextAlign.center,
-                                      enabled: false,
-                                      keyboardType: TextInputType.text,
-                                      controller: _timeController,
-                                      decoration: InputDecoration(
-                                        disabledBorder: UnderlineInputBorder(
-                                            borderSide: BorderSide.none),
-                                      ),
-                                      onChanged: (text) {
-                                        _myEvent.time = text;
-                                      },
-                                    ),
+                                        BoxDecoration(color: Colors.white),
+                                    child: _timeController.text == ""
+                                        ? Icon(
+                                            Icons.timer,
+                                            color: Color(0xff643165),
+                                            size: 50,
+                                          )
+                                        : TextFormField(
+                                            style: TextStyle(fontSize: 20),
+                                            textAlign: TextAlign.center,
+                                            enabled: false,
+                                            keyboardType: TextInputType.text,
+                                            controller: _timeController,
+                                            decoration: InputDecoration(
+                                              disabledBorder:
+                                                  UnderlineInputBorder(
+                                                      borderSide:
+                                                          BorderSide.none),
+                                            ),
+                                            onChanged: (text) {
+                                              _myEvent.time = text;
+                                            },
+                                          ),
                                   ),
                                 ),
                               ],
@@ -257,7 +277,7 @@ class AddEventState extends State<AddEventPage> {
                               ),
                               Text(
                                 //Location section
-                                "Location",
+                                getTranslated(context, 'location')!,
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
                               ),
@@ -283,7 +303,8 @@ class AddEventState extends State<AddEventPage> {
                                       ),
                                       labelStyle:
                                           TextStyle(color: Colors.white),
-                                      hintText: 'format : Address, Npa, City'),
+                                      hintText:
+                                          getTranslated(context, 'format')!),
                                   onChanged: (text) {
                                     List<String> temp = text.split(",");
                                     _myEvent.address = temp.elementAt(0);
@@ -297,7 +318,7 @@ class AddEventState extends State<AddEventPage> {
                               ),
                               Text(
                                 //Description of the events section
-                                "Description",
+                                getTranslated(context, 'description')!,
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
                               ),
@@ -328,10 +349,10 @@ class AddEventState extends State<AddEventPage> {
                                         borderSide:
                                             BorderSide(color: Colors.white),
                                       ),
-                                      labelText: '',
                                       labelStyle:
                                           TextStyle(color: Colors.white),
-                                      hintText: 'Description of the event'),
+                                      hintText: getTranslated(
+                                          context, 'description')!),
                                   onChanged: (text) {
                                     _myEvent.description = text;
                                   },
@@ -342,7 +363,7 @@ class AddEventState extends State<AddEventPage> {
                               ),
                               Text(
                                 //Description of the events section
-                                "Picture",
+                                getTranslated(context, 'picture')!,
                                 style: TextStyle(
                                     color: Colors.white, fontSize: 20),
                               ),
@@ -356,10 +377,20 @@ class AddEventState extends State<AddEventPage> {
                                   child: Container(
                                     height: 150,
                                     width: 200,
-                                    child: _pickedImage != null
-                                        ? Image.file(_pickedImage!,
-                                            fit: BoxFit.fill)
-                                        : Text(''),
+                                    child: _pickedImage != ""
+                                        ? isEditing
+                                            ? Image.network(_pickedImage,
+                                                fit: BoxFit.fill)
+                                            : kIsWeb
+                                                ? Image.network(_pickedImage,
+                                                    fit: BoxFit.fill)
+                                                : Image.file(File(_pickedImage),
+                                                    fit: BoxFit.fill)
+                                        : Icon(
+                                            Icons.photo,
+                                            color: Color(0xff643165),
+                                            size: 100,
+                                          ),
                                     decoration: BoxDecoration(
                                       shape: BoxShape.rectangle,
                                       color: Colors.white,
@@ -373,7 +404,7 @@ class AddEventState extends State<AddEventPage> {
                               TextButton(
                                 child: Container(
                                   height: 50,
-                                  width: 130,
+                                  width: 160,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.rectangle,
                                     color: Colors.white,
@@ -403,7 +434,7 @@ class AddEventState extends State<AddEventPage> {
                                       _myEvent.npa == "" ||
                                       _myEvent.city == "" "" ||
                                       _myEvent.description == "" ||
-                                      _pickedImage == null) {
+                                      _pickedImage == "") {
                                     //Error message to create
                                     _alertDialogFill();
                                   } else {
@@ -437,12 +468,48 @@ class AddEventState extends State<AddEventPage> {
   }
 
   void _pickImageGallery() async {
-    final picker = ImagePicker();
-    final pickedImage = await picker.getImage(source: ImageSource.gallery);
-    final pickedImageFile = File(pickedImage!.path);
-    setState(() {
-      _pickedImage = pickedImageFile;
-    });
+    try {
+      final picker = ImagePicker();
+      final pickedImage = await picker.getImage(source: ImageSource.gallery);
+      final pickedImageFile = pickedImage!.path;
+      final imageForApi;
+      if (kIsWeb)
+        imageForApi = await pickedImage.readAsBytes();
+      else
+        imageForApi = null;
+      setState(() {
+        _pickedImage = pickedImageFile;
+        _imageForAPI = imageForApi;
+      });
+    } on TypeError catch (exception) {
+      Navigator.of(context).pop();
+    } catch (error) {
+      AlertDialog(
+        title: Text(
+          getTranslated(context, 'wrong_message')!,
+        ),
+        content: SingleChildScrollView(
+          child: ListBody(
+            children: <Widget>[
+              Text(
+                getTranslated(context, 'check_photo_format')!,
+              ),
+            ],
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text(
+              getTranslated(context, 'ok_message')!,
+              style: TextStyle(color: Color(0xffa456a7)),
+            ),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ],
+      );
+    }
   }
 
   Future<String> _sendImageToFirebase(BuildContext context) async {
@@ -450,7 +517,12 @@ class AddEventState extends State<AddEventPage> {
         .ref()
         .child("eventImages")
         .child(_myEvent.title + ".jpg");
-    await ref.putFile(_pickedImage!);
+
+    if (kIsWeb)
+      await ref.putData(_imageForAPI);
+    else
+      await ref.putFile(File(_pickedImage));
+
     url = await ref.getDownloadURL();
 
     return url;
@@ -458,9 +530,9 @@ class AddEventState extends State<AddEventPage> {
 
   //Submit button
   Widget _setButtonText(BuildContext context) {
-    String text = "Submit";
+    String text = getTranslated(context, 'submit_btn')!;
     if (isEditing) {
-      text = "Save";
+      text = getTranslated(context, 'save')!;
     }
     return new Text(
       text,
@@ -534,19 +606,18 @@ class AddEventState extends State<AddEventPage> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('You cannot select a previous time'),
+          title: Text(getTranslated(context, 'cant_select_time')!),
           content: SingleChildScrollView(
             child: ListBody(
-              children: const <Widget>[
-                Text(
-                    'Please make sure that the selected time is in the future'),
+              children: <Widget>[
+                Text(getTranslated(context, 'select_time_future')!),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text(
-                'Approve',
+              child: Text(
+                getTranslated(context, 'approve')!,
                 style: TextStyle(color: Color(0xffa456a7)),
               ),
               onPressed: () {
@@ -566,19 +637,18 @@ class AddEventState extends State<AddEventPage> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Not all fields are correctly filled'),
+          title: Text(getTranslated(context, 'not_all_fields_filled')!),
           content: SingleChildScrollView(
             child: ListBody(
-              children: const <Widget>[
-                Text(
-                    'Please make sure that every fields are filled correctly.'),
+              children: <Widget>[
+                Text(getTranslated(context, 'fields_filled_correctly')!),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text(
-                'Approve',
+              child: Text(
+                getTranslated(context, 'approve')!,
                 style: TextStyle(color: Color(0xffa456a7)),
               ),
               onPressed: () {

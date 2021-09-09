@@ -1,15 +1,17 @@
+import 'package:a_voir_app/localization/language_constants.dart';
 import 'package:a_voir_app/models/MyEvent.dart';
 import 'package:a_voir_app/pages/addEventPage.dart';
 import 'package:a_voir_app/ui/appBar.dart';
 import 'package:a_voir_app/ui/drawerMenu.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dots_indicator/dots_indicator.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:share_plus/share_plus.dart';
 
 import 'allEventPage.dart';
+import 'filterEventPage.dart';
 
 //This page is used to display information about a specific event.
 class EventPage extends StatefulWidget {
@@ -52,6 +54,15 @@ class EventState extends State<EventPage> {
       setState(() {});
     });
     super.initState();
+  }
+
+  void share(BuildContext context, MyEvent myevents) {
+    final String text =
+        "Look I'm attending the event : ${myevents.title} on ${myevents.date} with ${myevents.attendees}";
+    RenderBox box = context.findRenderObject() as RenderBox;
+    Share.share(text.replaceAll('[', '').replaceAll(']', ''),
+        subject: "Event : ${myevents.title}",
+        sharePositionOrigin: box.localToGlobal(Offset.zero) & box.size);
   }
 
   @override
@@ -98,7 +109,6 @@ class EventState extends State<EventPage> {
                                 Padding(
                                   padding: EdgeInsets.only(top: 30),
                                 ),
-                                _addParticipateButton(context)
                               ],
                             ),
                           ),
@@ -127,8 +137,8 @@ class EventState extends State<EventPage> {
               Row(
                 children: <Widget>[
                   IconButton(
-                    padding: EdgeInsets.only(left: 30, right: 110),
-                    onPressed: () {},
+                    padding: EdgeInsets.only(left: 30, right: 100),
+                    onPressed: () => share(context, myEvent),
                     icon: Image.asset(
                       "assets/images/share.png",
                       height: 100,
@@ -136,7 +146,7 @@ class EventState extends State<EventPage> {
                     ),
                   ),
                   Text(
-                    'Event',
+                    getTranslated(context, 'event')!,
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   _addUpdateButton(context, snapshot.data!.provider)
@@ -149,7 +159,7 @@ class EventState extends State<EventPage> {
                   ),
                   Text(
                     //Creator section
-                    "Creator : ",
+                    getTranslated(context, 'creator')!,
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   Padding(
@@ -158,7 +168,18 @@ class EventState extends State<EventPage> {
                   Material(
                       color: Colors.transparent,
                       child: InkWell(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FilterEventPage(
+                                  user,
+                                  "",
+                                  "",
+                                  "",
+                                ),
+                              ));
+                        },
                         child: Container(
                           child: Row(
                             children: <Widget>[
@@ -180,7 +201,7 @@ class EventState extends State<EventPage> {
                   ),
                   Text(
                     //Subject section
-                    "Subject : ",
+                    getTranslated(context, 'subject')!,
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   Padding(
@@ -201,7 +222,7 @@ class EventState extends State<EventPage> {
                   ),
                   Text(
                     //Date section
-                    "Date : ",
+                    getTranslated(context, 'date2')!,
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   Padding(
@@ -220,7 +241,7 @@ class EventState extends State<EventPage> {
                   ),
                   Text(
                     //Time section
-                    "Time : ",
+                    getTranslated(context, 'time2')!,
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   Padding(
@@ -239,7 +260,7 @@ class EventState extends State<EventPage> {
                   ),
                   Text(
                     //Location section
-                    "Location : ",
+                    getTranslated(context, 'location2')!,
                     style: TextStyle(color: Colors.white, fontSize: 20),
                   ),
                   Padding(
@@ -266,7 +287,7 @@ class EventState extends State<EventPage> {
                     padding: EdgeInsets.only(bottom: 20, top: 20, left: 80),
                     child: Text(
                       //description section
-                      "Description : ",
+                      getTranslated(context, 'description2')!,
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
                   ),
@@ -295,7 +316,7 @@ class EventState extends State<EventPage> {
                     padding: EdgeInsets.only(top: 20, bottom: 10, left: 80),
                     child: Text(
                       //attendants section
-                      "Attendants : ",
+                      getTranslated(context, 'attendants')!,
                       style: TextStyle(color: Colors.white, fontSize: 20),
                     ),
                   ),
@@ -306,19 +327,19 @@ class EventState extends State<EventPage> {
               ),
               FutureBuilder(
                   future: getAttendants(context),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<List<Widget>> snapshot) {
+                  builder:
+                      (BuildContext context, AsyncSnapshot<Widget> snapshot) {
                     if (!snapshot.hasData) {
                       return CircularProgressIndicator();
                     }
-                    return new Column(children: snapshot.data!);
-                  })
+                    return new Column(children: <Widget>[snapshot.data!]);
+                  }),
+              Padding(padding: EdgeInsets.only(top: 30)),
+              _addParticipateButton(context)
             ]);
           }
-
           return CircularProgressIndicator();
         }
-
         return DotsIndicator(dotsCount: 3);
       },
     ));
@@ -333,7 +354,6 @@ class EventState extends State<EventPage> {
         .get();
 
     final Map<String, Object?>? document = event.data();
-
     myEvent = MyEvent.fromJson(document!);
     myEvent.id = eventId;
 
@@ -355,7 +375,7 @@ class EventState extends State<EventPage> {
   Widget _addUpdateButton(BuildContext context, String provider) {
     if (prefs!.getString('userId')!.compareTo(provider) == 0) {
       return IconButton(
-        padding: EdgeInsets.only(left: 120),
+        padding: EdgeInsets.only(left: 80),
         onPressed: () {
           Navigator.push(
             context,
@@ -373,64 +393,56 @@ class EventState extends State<EventPage> {
   }
 
   Widget _addParticipateButton(BuildContext context) {
-    if (!prefs!.getBool('isProvider')!) {
-      return TextButton(
-          child: Container(
-            height: 50,
-            width: 140,
-            decoration: BoxDecoration(
-              shape: BoxShape.rectangle,
-              color: Colors.white,
-              borderRadius: new BorderRadius.circular(25.0),
-            ),
-            child: Center(
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: <Widget>[
-                  //Will be used later to take part the event
-                  Container(
-                      child: new Text(
-                    "Participate",
-                    style: TextStyle(color: Color(0xffa456a7), fontSize: 20.0),
-                  ))
-                ],
-              ),
+    return TextButton(
+        child: Container(
+          height: 50,
+          width: 140,
+          decoration: BoxDecoration(
+            shape: BoxShape.rectangle,
+            color: Colors.white,
+            borderRadius: new BorderRadius.circular(25.0),
+          ),
+          child: Center(
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: <Widget>[
+                //Will be used later to take part the event
+                Container(
+                    child: new Text(
+                  getTranslated(context, 'participate')!,
+                  style: TextStyle(color: Color(0xffa456a7), fontSize: 20.0),
+                ))
+              ],
             ),
           ),
-          onPressed: () async {
-            bool isAttending = await isAlreadyParticipating();
-            if (!isAttending) {
-              //Participate button action
-              showParticipateAlertDialog(context);
-            } else {
-              _alreadyParticipating(context);
-            }
-          });
-    }
-    return Container();
+        ),
+        onPressed: () async {
+          bool isAttending = await isAlreadyParticipating();
+          if (!isAttending) {
+            //Participate button action
+            showParticipateAlertDialog(context);
+          } else {
+            _alreadyParticipating(context);
+          }
+        });
   }
 
   Future<bool> isAlreadyParticipating() async {
     bool alreadyParticipating = false;
 
-    var documentTest = await FirebaseFirestore.instance
+    var listAttendees = await FirebaseFirestore.instance
         .collection("events")
         .doc(myEvent.id)
         .get();
 
-    var test =
-        List.from(documentTest['attendees'] as List).contains('testUser');
-
-    if (test == true) {
-      alreadyParticipating = true;
-    }
+    alreadyParticipating = List.from(listAttendees['attendees'] as List)
+        .contains(await getUsername());
 
     return alreadyParticipating;
   }
 
   Future<String> getUsername() async {
-    User user = FirebaseAuth.instance.currentUser!;
-    var uidConnectedUser = user.uid;
+    var uidConnectedUser = prefs!.getString('userId');
 
     String value = "";
 
@@ -455,9 +467,9 @@ class EventState extends State<EventPage> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text("Participate"),
+      title: Text(getTranslated(context, 'participate')!),
       content: Text(
-        "You are already participating to this event !",
+        getTranslated(context, 'already_participating')!,
         style: TextStyle(color: Color(0xffa456a7)),
       ),
       actions: [
@@ -479,13 +491,15 @@ class EventState extends State<EventPage> {
 
     // set up the buttons
     Widget cancelButton = TextButton(
-      child: Text("Cancel", style: TextStyle(color: Colors.red)),
+      child: Text(getTranslated(context, 'cancel')!,
+          style: TextStyle(color: Colors.red)),
       onPressed: () {
         Navigator.of(context).pop();
       },
     );
     Widget continueButton = TextButton(
-      child: Text("Approve", style: TextStyle(color: Color(0xffa456a7))),
+      child: Text(getTranslated(context, 'approve')!,
+          style: TextStyle(color: Color(0xffa456a7))),
       onPressed: () {
         var attendeesRef =
             FirebaseFirestore.instance.collection("events").doc(eventId);
@@ -501,9 +515,9 @@ class EventState extends State<EventPage> {
 
     // set up the AlertDialog
     AlertDialog alert = AlertDialog(
-      title: Text("Participate"),
+      title: Text(getTranslated(context, 'participate')!),
       content: Text(
-        "Would you like to participate to this event ?",
+        getTranslated(context, 'participate_to_the_event')!,
         style: TextStyle(color: Color(0xffa456a7)),
       ),
       actions: [
@@ -528,46 +542,61 @@ class EventState extends State<EventPage> {
         .doc(myEvent.id)
         .get()
         .then((doc) {
-      var test2 = List.from(doc["attendees"]);
-      for (int i = 0; i < test2.length; i++) {
-        listOfAttendees.add(test2[i]);
+      var isParticipating2 = List.from(doc["attendees"]);
+      for (int i = 0; i < isParticipating2.length; i++) {
+        listOfAttendees.add(isParticipating2[i]);
       }
     });
     return listOfAttendees;
   }
 
-  Future<List<Widget>> getAttendants(BuildContext context) async {
-    List test = await getAttendeesFromDB();
-    myEvent.attendees = test;
+  Future<Widget> getAttendants(BuildContext context) async {
+    List isParticipating = await getAttendeesFromDB();
+    myEvent.attendees = isParticipating;
     List<Widget> listofAttendants = [];
 
-    for (var i = 0; i < test.length; i++) {
+    for (var i = 0; i < isParticipating.length; i++) {
       listofAttendants.add(Row(children: <Widget>[
-        Expanded(
-          child: Container(
-              padding: EdgeInsets.only(left: 110),
-              child: Material(
-                  color: Colors.transparent,
-                  child: InkWell(
-                    onTap: () {},
-                    child: Container(
-                      padding: EdgeInsets.only(top: 10),
-                      child: Row(
-                        children: <Widget>[
-                          Row(children: <Widget>[
-                            Padding(padding: EdgeInsets.only(left: 40))
-                          ]),
-                          Text(
-                            test[i].toString(),
-                            style: TextStyle(color: Colors.white, fontSize: 18),
-                          )
-                        ],
-                      ),
-                    ),
-                  ))),
-        ),
+        Container(
+            padding: EdgeInsets.only(left: 110),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => FilterEventPage(
+                          "",
+                          "",
+                          "",
+                          isParticipating[i].toString(),
+                        ),
+                      ));
+                },
+                child: Container(
+                  padding: EdgeInsets.only(top: 10),
+                  child: Row(children: <Widget>[
+                    Padding(padding: EdgeInsets.only(left: 40, bottom: 0)),
+                    Text(
+                      isParticipating[i].toString(),
+                      style: TextStyle(color: Colors.white, fontSize: 18),
+                    )
+                  ]),
+                ),
+              ),
+            )),
       ]));
     }
-    return listofAttendants;
+
+    return new Container(
+      child: Expanded(
+        child: SingleChildScrollView(
+          child: Column(children: listofAttendants),
+        ),
+      ),
+      width: 500,
+      height: 150,
+    );
   }
 }

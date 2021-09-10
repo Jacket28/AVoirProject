@@ -327,12 +327,24 @@ class EventState extends State<EventPage> {
               ),
               FutureBuilder(
                   future: getAttendants(context),
-                  builder:
-                      (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+                  builder: (BuildContext context,
+                      AsyncSnapshot<List<Widget>> snapshot) {
+                    if (snapshot.connectionState != ConnectionState.done) {
+                      return DotsIndicator(dotsCount: 3);
+                    }
                     if (!snapshot.hasData) {
                       return CircularProgressIndicator();
                     }
-                    return new Column(children: <Widget>[snapshot.data!]);
+                    return new Container(
+                        width: 500,
+                        height: 150,
+                        child: Column(children: [
+                          Expanded(
+                            child: SingleChildScrollView(
+                              child: Column(children: snapshot.data!),
+                            ),
+                          ),
+                        ]));
                   }),
               Padding(padding: EdgeInsets.only(top: 30)),
               _addParticipateButton(context)
@@ -550,7 +562,7 @@ class EventState extends State<EventPage> {
     return listOfAttendees;
   }
 
-  Future<Widget> getAttendants(BuildContext context) async {
+  Future<List<Widget>> getAttendants(BuildContext context) async {
     List isParticipating = await getAttendeesFromDB();
     myEvent.attendees = isParticipating;
     List<Widget> listofAttendants = [];
@@ -588,15 +600,6 @@ class EventState extends State<EventPage> {
             )),
       ]));
     }
-
-    return new Container(
-      child: Expanded(
-        child: SingleChildScrollView(
-          child: Column(children: listofAttendants),
-        ),
-      ),
-      width: 500,
-      height: 150,
-    );
+    return listofAttendants;
   }
 }

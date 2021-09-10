@@ -1,6 +1,7 @@
 import 'package:a_voir_app/localization/app_localization.dart';
 import 'package:a_voir_app/pages/allEventPage.dart';
 import 'package:a_voir_app/pages/loginPage.dart';
+import 'package:dots_indicator/dots_indicator.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -39,47 +40,51 @@ class _MyAppState extends State<MyApp> {
     return FutureBuilder(
         future: _testRefs(context),
         builder:
-            (BuildContext context, AsyncSnapshot<SharedPreferences> snapshot) {
-          var page;
-          if (snapshot.data!.getString('userId') != null) {
-            page = AllEventPage();
-          } else {
-            page = LoginPage();
-          }
-          return MaterialApp(
-              localizationsDelegates: [
-                AppLocalization.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              //supported languages
-              locale: _locale,
-              supportedLocales: [
-                Locale('en', 'US'), // English
-                Locale('fr', 'FR'), // French
-              ],
+            (BuildContext context, AsyncSnapshot<StatefulWidget> snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.hasData) {
+              return MaterialApp(
+                  localizationsDelegates: [
+                    AppLocalization.delegate,
+                    GlobalMaterialLocalizations.delegate,
+                    GlobalWidgetsLocalizations.delegate,
+                    GlobalCupertinoLocalizations.delegate,
+                  ],
+                  //supported languages
+                  locale: _locale,
+                  supportedLocales: [
+                    Locale('en', 'US'), // English
+                    Locale('fr', 'FR'), // French
+                  ],
 
-              //to check if the local codes are the same to the device codes
-              localeResolutionCallback: (deviceLocale, supportedLocales) {
-                for (var locale in supportedLocales) {
-                  if (locale.languageCode == deviceLocale!.languageCode &&
-                      locale.countryCode == deviceLocale.countryCode) {
-                    return deviceLocale;
-                  }
-                }
-                return supportedLocales.first;
-              },
-              debugShowCheckedModeBanner: false,
-              home: Scaffold(
-                key: _scaffoldKey,
-                resizeToAvoidBottomInset: false,
-                body: page,
-              ));
+                  //to check if the local codes are the same to the device codes
+                  localeResolutionCallback: (deviceLocale, supportedLocales) {
+                    for (var locale in supportedLocales) {
+                      if (locale.languageCode == deviceLocale!.languageCode &&
+                          locale.countryCode == deviceLocale.countryCode) {
+                        return deviceLocale;
+                      }
+                    }
+                    return supportedLocales.first;
+                  },
+                  debugShowCheckedModeBanner: false,
+                  home: Scaffold(
+                    key: _scaffoldKey,
+                    resizeToAvoidBottomInset: false,
+                    body: snapshot.data!,
+                  ));
+            }
+          }
+          return CircularProgressIndicator();
         });
   }
 
-  Future<SharedPreferences> _testRefs(BuildContext context) async {
-    return await SharedPreferences.getInstance();
+  Future<StatefulWidget> _testRefs(BuildContext context) async {
+    final instance = await SharedPreferences.getInstance();
+    if (instance.getString('userId') != null) {
+      return AllEventPage();
+    } else {
+      return LoginPage();
+    }
   }
 }

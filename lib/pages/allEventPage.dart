@@ -19,8 +19,6 @@ class AllEventPage extends StatefulWidget {
 class _AllEventState extends State<AllEventPage> {
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
-  String user = "";
-
   @override
   Widget build(BuildContext context) {
     return new WillPopScope(
@@ -36,7 +34,8 @@ class _AllEventState extends State<AllEventPage> {
           backgroundColor: Color(0xffa456a7),
           body: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
-            return Column(
+            return Container(
+                child: new Column(
               children: [
                 Expanded(
                   child: SingleChildScrollView(
@@ -49,7 +48,7 @@ class _AllEventState extends State<AllEventPage> {
                 ),
                 _addButton(context),
               ],
-            );
+            ));
           }),
         ));
   }
@@ -152,13 +151,13 @@ class _AllEventState extends State<AllEventPage> {
             (BuildContext context, AsyncSnapshot<SharedPreferences> snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
             if (snapshot.hasData) {
-              this.user = snapshot.data!.getString('userId')!;
+              print('has data');
+
               if (snapshot.data!.getBool('isProvider')!) {
-                return _addButtonVisible(
-                  context,
-                );
+                return _addButtonVisible(context);
               }
             }
+            return new CircularProgressIndicator();
           }
           return Container(color: Colors.transparent);
         },
@@ -167,7 +166,9 @@ class _AllEventState extends State<AllEventPage> {
   }
 
   Future<SharedPreferences> _setreferences(BuildContext context) async {
-    return await SharedPreferences.getInstance();
+    final instance = await SharedPreferences.getInstance();
+    await Future.delayed(Duration(seconds: 1));
+    return instance;
   }
 
   Widget _addButtonVisible(BuildContext context) {

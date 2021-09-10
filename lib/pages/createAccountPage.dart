@@ -598,15 +598,18 @@ class CreateAccountState extends State<CreateAccountPage> {
   }
 
   Future<bool> _isUsernameValid(String username) async {
-    FirebaseFirestore.instance
+    bool response = false;
+    await FirebaseFirestore.instance
         .collection("users")
         .where('username', isEqualTo: username)
         .get()
         .then((querysnapshot) {
       if (querysnapshot.size == 0) {
-        return true;
+        print('true');
+        response = true;
       }
     });
-    return false;
+    print('false');
+    return response;
   }
 }
